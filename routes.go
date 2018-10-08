@@ -144,7 +144,7 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 	//to be the same as struct variables
 	upperIgcFIeld := strings.Title(igcField)
 
-	//Check if the parameter passed is an integer.
+	//Try to convert the paramter to an int
 	i, err := strconv.Atoi(igcId)
 
 	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
@@ -161,7 +161,7 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//Handle int
+		//Handle type
 		if strings.Contains(f.String(), "int Value") {
 			json.NewEncoder(w).Encode(f.Int()) //Print as int
 		} else {
