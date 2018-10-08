@@ -62,8 +62,7 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	track, err := igc.ParseLocation(s)
 	if err != nil {
 		//Bad IGC file or bad URL
-		//http.Error(w, "Bad file or URL", http.StatusBadRequest)
-		http.Error(w, s, http.StatusBadRequest)
+		http.Error(w, "Bad file or URL", http.StatusBadRequest)
 
 		return //Stop whatever we are doing..
 	}
