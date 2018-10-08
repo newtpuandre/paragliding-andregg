@@ -154,18 +154,18 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 		r := reflect.ValueOf(track)
 		f := reflect.Indirect(r).FieldByName(upperIgcFIeld)
 
-		//Handle string
-		if !strings.Contains(f.String(), "invalid Value") { //If the param is incorrect
+		if strings.Contains(f.String(), "invalid Value") { //Does the field exist?
+			//Return 404 when it doesn't exist
 
-			//Handle int
-			if strings.Contains(f.String(), "int Value") {
-				json.NewEncoder(w).Encode(f.Int()) //Print as int
-			} else {
-				json.NewEncoder(w).Encode(f.String()) //Print as string
-			}
-
-		} else {
 			http.Error(w, "", 404) //404 Not found
+			return
+		}
+
+		//Handle int
+		if strings.Contains(f.String(), "int Value") {
+			json.NewEncoder(w).Encode(f.Int()) //Print as int
+		} else {
+			json.NewEncoder(w).Encode(f.String()) //Print as string
 		}
 
 	} else {
