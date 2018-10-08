@@ -1,13 +1,28 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux" //Router
 )
 
+func determineListenAddress() (string, error) { //Inorder to get the port heroku assigns us
+	port := os.Getenv("PORT")
+	if port == "" {
+		return "", fmt.Errorf("$PORT not set")
+	}
+	return ":" + port, nil
+}
+
 func main() {
+
+	addr, err := determineListenAddress() //Get listening address
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//Setup router
 	router := mux.NewRouter().StrictSlash(true)
@@ -19,8 +34,7 @@ func main() {
 	router.HandleFunc("/igcinfo/api/igc/{igcId}", IgcId).Methods("GET")
 	router.HandleFunc("/igcinfo/api/igc/{igcId}/{igcField}", IgcField).Methods("GET")
 
-	http.Handle("/", router)
-
 	//Log fatal errors and start the server
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(addr, router))
+	process.env.POrt
 }
