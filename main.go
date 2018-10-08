@@ -36,5 +36,4 @@ func main() {
 
 	//Log fatal errors and start the server
 	log.Fatal(http.ListenAndServe(addr, router))
-	process.env.POrt
 }
