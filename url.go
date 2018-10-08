@@ -1,4 +1,4 @@
-package IGCViewer
+package main
 
 type Url struct {
 	Url string `json:"Url"`

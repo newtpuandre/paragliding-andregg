@@ -1,4 +1,4 @@
-package IGCViewer
+package main
 
 type Track struct {
 	H_date       string `json:"H_date"`

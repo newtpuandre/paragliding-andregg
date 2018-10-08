@@ -1,4 +1,4 @@
-package IGCViewer
+package main
 
 import (
 	"github.com/rickb777/date/period"
