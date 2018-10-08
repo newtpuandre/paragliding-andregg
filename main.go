@@ -22,5 +22,5 @@ func main() {
 	http.Handle("/", router)
 
 	//Log fatal errors and start the server
-	log.Fatal(http.ListenAndServe(":80", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
