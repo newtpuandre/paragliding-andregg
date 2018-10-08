@@ -1,0 +1,50 @@
+{
+	"ImportPath": "APIAssignment1",
+	"GoVersion": "go1.11",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/golang/geo/r1",
+			"Rev": "23949e136d58aeb8aa39844a312b68d90c4eb8aa"
+		},
+		{
+			"ImportPath": "github.com/golang/geo/r2",
+			"Rev": "23949e136d58aeb8aa39844a312b68d90c4eb8aa"
+		},
+		{
+			"ImportPath": "github.com/golang/geo/r3",
+			"Rev": "23949e136d58aeb8aa39844a312b68d90c4eb8aa"
+		},
+		{
+			"ImportPath": "github.com/golang/geo/s1",
+			"Rev": "23949e136d58aeb8aa39844a312b68d90c4eb8aa"
+		},
+		{
+			"ImportPath": "github.com/golang/geo/s2",
+			"Rev": "23949e136d58aeb8aa39844a312b68d90c4eb8aa"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.6.2-9-g9e1f595",
+			"Rev": "9e1f5955c0d22b55d9e20d6faa28589f83b2faca"
+		},
+		{
+			"ImportPath": "github.com/marni/goigc",
+			"Comment": "v0.1.0-10-g71f274d",
+			"Rev": "71f274dd21ef320ccbb6c6271c7df7fd8a908779"
+		},
+		{
+			"ImportPath": "github.com/rickb777/date/period",
+			"Comment": "v1.7.1-1-g8571bfe",
+			"Rev": "8571bfe5c81fbade73a615f9ba791c4a1f1b79a3"
+		},
+		{
+			"ImportPath": "github.com/rickb777/plural",
+			"Comment": "v1.2.0",
+			"Rev": "7589705ae1b0a218b5389c04b1505e0c8defbc1f"
+		}
+	]
+}
