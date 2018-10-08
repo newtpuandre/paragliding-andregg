@@ -2,9 +2,10 @@ package IGCViewer
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/marni/goigc" //Parse and handle IGC Files
@@ -48,8 +49,10 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&decodedUrl)
 
 	if err != nil {
-		//Handle error
-		panic(err)
+		//Malformed content body.
+		http.Error(w, "Malformed content body", http.StatusBadRequest)
+
+		return //Stop whatever we are doing..
 	}
 
 	//Parse IGC File from URL
@@ -58,7 +61,10 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	//Handle if the URL isnt a .igc file
 	track, err := igc.ParseLocation(s)
 	if err != nil {
-		fmt.Errorf("Problem reading the track", err)
+		//Bad IGC file or bad URL
+		http.Error(w, "Bad file or URL", http.StatusBadRequest)
+
+		return //Stop whatever we are doing..
 	}
 
 	//Fill Track struct with required information
@@ -70,12 +76,17 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.Track_length = len(track.Points) //This is probably wrong. Check!
 	newTrack.H_date = track.Date.String()
 
+	//Add track to array for all tracks
 	tracks = append(tracks, newTrack)
 
-	//Add ID to array over used ids
+	//Add ID to array for used ids
 	trackID = append(trackID, lastID)
+
+	//Fill return struct
 	var idStruct Url_ID
 	idStruct.Id = lastID
+
+	//Remember to count up used ids
 	lastID++
 
 	//Return the struct as a json object.
@@ -104,10 +115,10 @@ func IgcIdAll(w http.ResponseWriter, r *http.Request) {
 
 //IgcId returns a json object with a specific id
 func IgcId(w http.ResponseWriter, r *http.Request) {
+	//Get parameters
 	vars := mux.Vars(r)
 	igcId := vars["igcId"]
 
-	fmt.Println(igcId)
 	//Check if the parameter passed is an integer.
 	i, err := strconv.Atoi(igcId)
 
@@ -116,12 +127,48 @@ func IgcId(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(tracks[i])
 	} else {
 		//Return bad request
-		panic(err)
+		http.Error(w, "", 404) //404 Not found
 	}
 
 }
 
 //IgcField returns information about a specific field from a track
 func IgcField(w http.ResponseWriter, r *http.Request) {
+	//Get parameters
+	vars := mux.Vars(r)
+	igcId := vars["igcId"]
+	igcField := vars["igcField"]
+
+	//Make the first letter uppcase
+	//to be the same as struct variables
+	upperIgcFIeld := strings.Title(igcField)
+
+	//Check if the parameter passed is an integer.
+	i, err := strconv.Atoi(igcId)
+
+	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
+		track := tracks[i]
+
+		//Try to match user input with field from the selected track struct
+		r := reflect.ValueOf(track)
+		f := reflect.Indirect(r).FieldByName(upperIgcFIeld)
+
+		//Handle string
+		if !strings.Contains(f.String(), "invalid Value") { //If the param is incorrect
+
+			//Handle int
+			if strings.Contains(f.String(), "int Value") {
+				json.NewEncoder(w).Encode(f.Int()) //Print as int
+			} else {
+				json.NewEncoder(w).Encode(f.String()) //Print as string
+			}
+
+		} else {
+			http.Error(w, "", 404) //404 Not found
+		}
+
+	} else {
+		http.Error(w, "", 404) //404 Not found
+	}
 
 }
