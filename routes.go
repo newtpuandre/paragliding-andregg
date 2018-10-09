@@ -75,11 +75,8 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.Glider_id = track.GliderID
 	newTrack.H_date = track.Date.String()
 
-	//Loop through points and add the distance between them together
+	//Add the distance between the start and finish point
 	newTrack.Track_length = track.Points[0].Distance(track.Points[len(track.Points)-1])
-	//for i := 0; i < len(track.Points)-1; i++ {
-	//	newTrack.Track_length += track.Points[i].Distance(track.Points[i+1])
-	//}
 
 	//Add track to array for all tracks
 	tracks = append(tracks, newTrack)
@@ -139,6 +136,8 @@ func IgcID(w http.ResponseWriter, r *http.Request) {
 
 //IgcField returns information about a specific field from a track
 func IgcField(w http.ResponseWriter, r *http.Request) {
+	//Header is not set because it defaults to text/plain charset=utf-8
+
 	//Get parameters
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
@@ -167,7 +166,7 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 
 		//Handle type
 		if strings.Contains(f.String(), "float64 Value") {
-			json.NewEncoder(w).Encode(f.Float()) //Print as int
+			json.NewEncoder(w).Encode(f.Float()) //Print as float
 		} else {
 			json.NewEncoder(w).Encode(f.String()) //Print as string
 		}
