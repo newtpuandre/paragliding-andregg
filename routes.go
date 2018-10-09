@@ -16,7 +16,7 @@ import (
 )
 
 //store startime of the application for further use
-var startTime time.Time = time.Now()
+var startTime time.Now
 
 //Tracks stored in memory
 var trackID []int
