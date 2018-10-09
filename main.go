@@ -29,9 +29,9 @@ func main() {
 
 	//Make the router handle routes. Routes located in routes.go
 	router.HandleFunc("/igcinfo/api", APIInfoRoute).Methods("GET")
-	router.HandleFunc("/igcinfo/api/igc", IgcIdPost).Methods("POST")
-	router.HandleFunc("/igcinfo/api/igc", IgcIdAll).Methods("GET")
-	router.HandleFunc("/igcinfo/api/igc/{igcId}", IgcId).Methods("GET")
+	router.HandleFunc("/igcinfo/api/igc", IgcIDPost).Methods("POST")
+	router.HandleFunc("/igcinfo/api/igc", IgcIDAll).Methods("GET")
+	router.HandleFunc("/igcinfo/api/igc/{igcId}", IgcID).Methods("GET")
 	router.HandleFunc("/igcinfo/api/igc/{igcId}/{igcField}", IgcField).Methods("GET")
 
 	//Log fatal errors and start the server

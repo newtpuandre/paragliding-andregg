@@ -16,7 +16,7 @@ import (
 )
 
 //store startime of the application for further use
-var startTime time.Now
+var startTime time.Time = time.Now()
 
 //Tracks stored in memory
 var trackID []int
@@ -39,14 +39,14 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(trackerInfo)
 }
 
-//IgcIdPost handles and adds URL of flight routes into memory
-func IgcIdPost(w http.ResponseWriter, r *http.Request) {
+//IgcIDPost handles and adds URL and flight routes into memory
+func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	//TODO: Handle ERRORS
 
 	//Decode incoming url
-	var decodedUrl Url
+	var decodedURL Url
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&decodedUrl)
+	err := decoder.Decode(&decodedURL)
 
 	if err != nil {
 		//Malformed content body.
@@ -56,7 +56,7 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Parse IGC File from URL
-	s := decodedUrl.Url
+	s := decodedURL.Url
 
 	//Handle if the URL isnt a .igc file
 	track, err := igc.ParseLocation(s)
@@ -99,8 +99,8 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//IgcIdAll returns an json array with all track ids
-func IgcIdAll(w http.ResponseWriter, r *http.Request) {
+//IgcIDAll returns an json array with all track ids
+func IgcIDAll(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -117,14 +117,14 @@ func IgcIdAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//IgcId returns a json object with a specific id
-func IgcId(w http.ResponseWriter, r *http.Request) {
+//IgcID returns a json object with a specific id
+func IgcID(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
 	vars := mux.Vars(r)
-	igcId := vars["igcId"]
+	igcID := vars["igcId"]
 
 	//Check if the parameter passed is an integer.
-	i, err := strconv.Atoi(igcId)
+	i, err := strconv.Atoi(igcID)
 
 	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -140,7 +140,7 @@ func IgcId(w http.ResponseWriter, r *http.Request) {
 func IgcField(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
 	vars := mux.Vars(r)
-	igcId := vars["igcId"]
+	igcID := vars["igcId"]
 	igcField := vars["igcField"]
 
 	//Make the first letter uppcase
@@ -148,7 +148,7 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 	upperIgcFIeld := strings.Title(igcField)
 
 	//Try to convert the paramter to an int
-	i, err := strconv.Atoi(igcId)
+	i, err := strconv.Atoi(igcID)
 
 	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
 		track := tracks[i]
