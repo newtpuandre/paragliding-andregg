@@ -88,7 +88,6 @@ func TestIgcIDAll(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestIgcID(t *testing.T) {
