@@ -75,8 +75,8 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.Glider_id = track.GliderID
 	newTrack.H_date = track.Date.String()
 
-	for x := range track.Points {
-		newTrack.Track_length += track.Points[0].Distance(track.Points[x])
+	for i := 0; i < len(track.Points)-1; i++ {
+		newTrack.Track_length += track.Points[i].Distance(track.Points[i+1])
 	}
 
 	//Add track to array for all tracks
