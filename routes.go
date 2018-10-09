@@ -76,7 +76,7 @@ func IgcIdPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.H_date = track.Date.String()
 
 	for x := range track.Points {
-		newTrack.Track_length += track.Points[x].Distance(track.Points[x])
+		newTrack.Track_length += track.Points[0].Distance(track.Points[x])
 	}
 
 	//Add track to array for all tracks
