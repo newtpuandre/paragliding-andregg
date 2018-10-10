@@ -11,6 +11,7 @@ import (
 	"testing"
 )
 
+//https://github.com/marni/imt2681_cloud/blob/master/studentdb/api_student_test.go
 func TestAPIInfoRoute(t *testing.T) {
 
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
