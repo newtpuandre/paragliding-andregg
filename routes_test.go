@@ -1,4 +1,5 @@
 //Tests for routes.go file
+//Improvements to be done: Clearer variable names.
 package main
 
 import (
