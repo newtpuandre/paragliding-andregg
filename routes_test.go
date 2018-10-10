@@ -4,11 +4,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 func TestAPIInfoRoute(t *testing.T) {
@@ -18,6 +20,7 @@ func TestAPIInfoRoute(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(APIInfoRoute))
 	defer server.Close()
 
+	//Make a GET request to the server
 	req, err := http.Get(server.URL + "/igcinfo/api")
 	if err != nil {
 		t.Fatal(err)
@@ -29,10 +32,10 @@ func TestAPIInfoRoute(t *testing.T) {
 			status, http.StatusOK)
 	}
 
+	//Create a struct to hold info
 	var testInfo apiInfo
 	decoder := json.NewDecoder(req.Body)
 	decoderr := decoder.Decode(&testInfo)
-	fmt.Println(testInfo.Info)
 
 	if decoderr != nil {
 		t.Fatal(decoderr)
@@ -42,6 +45,7 @@ func TestAPIInfoRoute(t *testing.T) {
 	expected1 := "Service for IGC tracks."
 	expected2 := `"version": "v1"`
 
+	//Is info as expected?
 	if testInfo.Info == expected1 && testInfo.Version == expected2 {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			testInfo.Info+" "+testInfo.Version, expected1+" "+expected2)
@@ -50,9 +54,11 @@ func TestAPIInfoRoute(t *testing.T) {
 }
 
 func TestIgcIDPost(t *testing.T) {
+	//Create new test server
 	server := httptest.NewServer(http.HandlerFunc(IgcIDPost))
 	defer server.Close()
 
+	//Struct that we pass with the request
 	var IGCURL Url
 	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
@@ -64,6 +70,13 @@ func TestIgcIDPost(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Check the status code is what we expect.
+	if status := req.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	//Response struct
 	var testID Url_ID
 	decoder := json.NewDecoder(req.Body)
 	decoderr := decoder.Decode(&testID)
@@ -72,119 +85,184 @@ func TestIgcIDPost(t *testing.T) {
 		t.Fatal(decoderr)
 	}
 
-	// Check the status code is what we expect.
-	if status := req.StatusCode; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+	//Is result correct?
+	if testID.Id < 0 {
+		t.Fatal("ID not correct or correctly added!")
 	}
 
 }
 
 func TestIgcIDAll(t *testing.T) {
+	//Possible improvements. Better check fo the API response
 
-	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
-	// pass 'nil' as the third parameter.
-	req, err := http.NewRequest("GET", "/igcinfo/api/igc", nil)
+	//New test server
+	server := httptest.NewServer(http.HandlerFunc(IgcIDAll))
+	defer server.Close()
+
+	//Get Request
+	res, err := http.Get(server.URL + "/igcinfo/api/igc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(IgcIDAll)
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(rr, req)
+	//Convert response to bits and then to string
+	bodyBytes, err2 := ioutil.ReadAll(res.Body)
+	if err2 != nil {
+		t.Fatal("Could not convert to string")
+	}
+	bodyString := string(bodyBytes)
 
 	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
+	if status := res.StatusCode; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected1 := `"["`
-	expected2 := `"]"`
+	//Does the string contain a opening and closing bracket?
+	//Aka is the response an array? Should check for an actual array?
+	if !strings.Contains(bodyString, "[") {
+		t.Fatal("Not an array in response.")
+	}
 
-	if strings.Contains(rr.Body.String(), expected1) && strings.Contains(rr.Body.String(), expected2) {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected1+" "+expected2)
+	if !strings.Contains(bodyString, "]") {
+		t.Fatal("Not an array in response.")
 	}
 }
 
 func TestIgcID(t *testing.T) {
-	rr := httptest.NewRecorder()
+	//Create a new mux router and add routes and create a server
+	m := mux.NewRouter()
+	addRoutes(m)
+	server := httptest.NewServer(m)
 
+	//URL Struct we send as body
 	var IGCURL Url
 	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
 
-	request, erro := http.NewRequest("POST", "igcinfo/api/igc", b)
-	if erro != nil {
-		t.Fatal(erro)
-	}
-
-	//post data
-	handler2 := http.HandlerFunc(IgcIDPost)
-	handler2.ServeHTTP(rr, request)
-	fmt.Println(rr.Body.String())
-	req, err := http.NewRequest("GET", "/igcinfo/api/igc/0", nil)
+	//Post IGCURL as json struct
+	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-
-	handler := http.HandlerFunc(IgcID)
-	handler.ServeHTTP(rr, req)
-	fmt.Println(rr.Body.String())
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-
 	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
+	if status := req.StatusCode; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected := `{"H_date": "2016-02-19 00:00:00 +0000 UTC","pilot": "Miguel Angel Gordillo","glider": "RV8","glider_id": "EC-XLL","track_length": 425.95571656352956}`
+	//Response struct
+	var testID Url_ID
+	decoder := json.NewDecoder(req.Body)
+	decoderr := decoder.Decode(&testID)
+	if decoderr != nil {
+		t.Fatal(decoderr)
+	}
 
-	if rr.Body.String() == expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+	//Is the ID set and above 0?
+	if testID.Id < 0 {
+		t.Fatal("ID not correct or correctly added!")
+	}
+
+	//Get whole Track with id 0
+	req1, err1 := http.Get(server.URL + "/igcinfo/api/igc/0")
+	if err1 != nil {
+		t.Fatal(err1)
+	}
+
+	// Check the status code is what we expect.
+	if status := req1.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	//Response Track which we compare with the "correct" one
+	var testTrack Track
+	decoder1 := json.NewDecoder(req1.Body)
+	decoderr1 := decoder1.Decode(&testTrack)
+	if decoderr1 != nil {
+		t.Fatal(decoderr1)
+	}
+
+	//Fill inn correct information and test the response againt it.
+	var correctTrack Track
+	correctTrack.H_date = "2016-02-19 00:00:00 +0000 UTC"
+	correctTrack.Pilot = "Miguel Angel Gordillo"
+	correctTrack.Glider = "RV8"
+	correctTrack.Glider_id = "EC-XLL"
+	correctTrack.Track_length = 425.95571656352956
+
+	if testTrack != correctTrack {
+		t.Fatal("Track info is different from test info")
 	}
 
 }
 
 func TestIgcIDField(t *testing.T) {
-	req, err := http.NewRequest("GET", "/igcinfo/api/igc/0/track_length", nil)
+	//Possible improvements: Check more than one field.
+
+	//Create a new mux router and add routes and create a server
+	m := mux.NewRouter()
+	addRoutes(m)
+	server := httptest.NewServer(m)
+
+	//URL Struct we send as body
+	var IGCURL Url
+	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(IGCURL)
+
+	//Post IGCURL as json struct
+	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(IgcField)
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(rr, req)
-
 	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
+	if status := req.StatusCode; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected := `425.95571656352956`
-
-	if rr.Body.String() == expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+	//Response struct
+	var testID Url_ID
+	decoder := json.NewDecoder(req.Body)
+	decoderr := decoder.Decode(&testID)
+	if decoderr != nil {
+		t.Fatal(decoderr)
 	}
+
+	//Is the ID set and above 0?
+	if testID.Id < 0 {
+		t.Fatal("ID not correct or correctly added!")
+	}
+
+	//Get whole Track with id 0 and pilot field
+	req1, err1 := http.Get(server.URL + "/igcinfo/api/igc/0/pilot")
+	if err1 != nil {
+		t.Fatal(err1)
+	}
+	// Check the status code is what we expect.
+	if status := req1.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	//Get response body and check against the "correct" pilot
+	bodyBytes, err2 := ioutil.ReadAll(req1.Body)
+	if err2 != nil {
+		t.Fatal("Could not convert to string")
+	}
+
+	var correctTrackInfo Track
+	correctTrackInfo.Pilot = "Miguel Angel Gordillo"
+
+	if strings.Contains(correctTrackInfo.Pilot, string(bodyBytes)) {
+		t.Fatal("Track info is different from test info")
+	}
+
 }
