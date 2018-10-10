@@ -11,24 +11,16 @@ import (
 	"testing"
 )
 
-//https://github.com/marni/imt2681_cloud/blob/master/studentdb/api_student_test.go
 func TestAPIInfoRoute(t *testing.T) {
 
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
 	server := httptest.NewServer(http.HandlerFunc(APIInfoRoute))
+	defer server.Close()
 
 	req, err := http.Get(server.URL + "/igcinfo/api")
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	var testInfo apiInfo
-	decoder := json.NewDecoder(req.Body)
-	decoderr := decoder.Decode(&testInfo)
-
-	if decoderr != nil {
-		t.Fatal(decoderr)
 	}
 
 	// Check the status code is what we expect.
@@ -37,7 +29,16 @@ func TestAPIInfoRoute(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
+	var testInfo apiInfo
+	decoder := json.NewDecoder(req.Body)
+	decoderr := decoder.Decode(&testInfo)
+	fmt.Println(testInfo.Info)
+
+	if decoderr != nil {
+		t.Fatal(decoderr)
+	}
+
+	// Check the response body is what we expect. Dont check uptime. Is variable
 	expected1 := "Service for IGC tracks."
 	expected2 := `"version": "v1"`
 
@@ -49,39 +50,32 @@ func TestAPIInfoRoute(t *testing.T) {
 }
 
 func TestIgcIDPost(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(IgcIDPost))
+	defer server.Close()
 
 	var IGCURL Url
 	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
-	var APIPostURL = "/igcinfo/api/igc"
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
 
-	req, err := http.NewRequest("POST", APIPostURL, b)
+	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(IgcIDPost)
+	var testID Url_ID
+	decoder := json.NewDecoder(req.Body)
+	decoderr := decoder.Decode(&testID)
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(rr, req)
-
-	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+	if decoderr != nil {
+		t.Fatal(decoderr)
 	}
 
-	// Check the response body is what we expect.
-	expected1 := `{"id": 0}`
-
-	if strings.Contains(rr.Body.String(), expected1) {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected1)
+	// Check the status code is what we expect.
+	if status := req.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
 	}
 
 }
