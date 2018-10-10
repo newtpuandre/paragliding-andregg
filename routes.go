@@ -167,7 +167,7 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 
 		//Handle type
 		if strings.Contains(f.String(), "float64 Value") {
-			json.NewEncoder(w).Encode(f.Float()) //Print as int
+			json.NewEncoder(w).Encode(f.Float()) //Print as float
 		} else {
 			json.NewEncoder(w).Encode(f.String()) //Print as string
 		}
