@@ -58,7 +58,11 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	//Parse IGC File from URL
 	s := decodedURL.Url
 
-	//Handle if the URL isnt a .igc file
+	if !strings.Contains(s, ".igc") { //Not a secure way to check filetype...
+		http.Error(w, "Not a IGC file", http.StatusBadRequest)
+		return
+	}
+
 	track, err := igc.ParseLocation(s)
 	if err != nil {
 		//Bad IGC file or bad URL
