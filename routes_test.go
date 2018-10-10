@@ -60,8 +60,8 @@ func TestIgcIDPost(t *testing.T) {
 	defer server.Close()
 
 	//Struct that we pass with the request
-	var IGCURL Url
-	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
+	var IGCURL URL
+	IGCURL.URL = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
@@ -78,7 +78,7 @@ func TestIgcIDPost(t *testing.T) {
 	}
 
 	//Response struct
-	var testID Url_ID
+	var testID URLID
 	decoder := json.NewDecoder(req.Body)
 	decoderr := decoder.Decode(&testID)
 
@@ -87,7 +87,7 @@ func TestIgcIDPost(t *testing.T) {
 	}
 
 	//Is result correct?
-	if testID.Id < 0 {
+	if testID.ID < 0 {
 		t.Fatal("ID not correct or correctly added!")
 	}
 
@@ -137,8 +137,8 @@ func TestIgcID(t *testing.T) {
 	server := httptest.NewServer(m)
 
 	//URL Struct we send as body
-	var IGCURL Url
-	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
+	var IGCURL URL
+	IGCURL.URL = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
@@ -156,7 +156,7 @@ func TestIgcID(t *testing.T) {
 	}
 
 	//Response struct
-	var testID Url_ID
+	var testID URLID
 	decoder := json.NewDecoder(req.Body)
 	decoderr := decoder.Decode(&testID)
 	if decoderr != nil {
@@ -164,7 +164,7 @@ func TestIgcID(t *testing.T) {
 	}
 
 	//Is the ID set and above 0?
-	if testID.Id < 0 {
+	if testID.ID < 0 {
 		t.Fatal("ID not correct or correctly added!")
 	}
 
@@ -211,8 +211,8 @@ func TestIgcIDField(t *testing.T) {
 	server := httptest.NewServer(m)
 
 	//URL Struct we send as body
-	var IGCURL Url
-	IGCURL.Url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
+	var IGCURL URL
+	IGCURL.URL = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
@@ -230,7 +230,7 @@ func TestIgcIDField(t *testing.T) {
 	}
 
 	//Response struct
-	var testID Url_ID
+	var testID URLID
 	decoder := json.NewDecoder(req.Body)
 	decoderr := decoder.Decode(&testID)
 	if decoderr != nil {
@@ -238,7 +238,7 @@ func TestIgcIDField(t *testing.T) {
 	}
 
 	//Is the ID set and above 0?
-	if testID.Id < 0 {
+	if testID.ID < 0 {
 		t.Fatal("ID not correct or correctly added!")
 	}
 

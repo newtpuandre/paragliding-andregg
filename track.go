@@ -1,5 +1,7 @@
 package main
 
+//Track stores information about one Track
+//Struct variables need to be with underscore inorder for the reflect magic to work..
 type Track struct {
 	H_date       string  `json:"H_date"`
 	Pilot        string  `json:"pilot"`

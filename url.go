@@ -1,9 +1,11 @@
 package main
 
-type Url struct {
-	Url string `json:"Url"`
+//URL is used when a user posts a JSON object with an URL
+type URL struct {
+	URL string `json:"Url"`
 }
 
-type Url_ID struct {
-	Id int `json:"id"`
+//URLID is used to return a JSON object with a new ID to the User
+type URLID struct {
+	ID int `json:"id"`
 }

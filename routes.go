@@ -44,7 +44,7 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	//TODO: Handle ERRORS
 
 	//Decode incoming url
-	var decodedURL Url
+	var decodedURL URL
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&decodedURL)
 
@@ -56,7 +56,7 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Parse IGC File from URL
-	s := decodedURL.Url
+	s := decodedURL.URL
 
 	if !strings.Contains(s, ".igc") { //Not a secure way to check filetype...
 		http.Error(w, "Not a IGC file", http.StatusBadRequest)
@@ -89,8 +89,8 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	trackID = append(trackID, lastID)
 
 	//Fill return struct
-	var idStruct Url_ID
-	idStruct.Id = lastID
+	var idStruct URLID
+	idStruct.ID = lastID
 
 	//Remember to count up used ids
 	lastID++
