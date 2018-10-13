@@ -194,7 +194,7 @@ func TestIgcID(t *testing.T) {
 	correctTrack.Pilot = "Miguel Angel Gordillo"
 	correctTrack.Glider = "RV8"
 	correctTrack.Glider_id = "EC-XLL"
-	correctTrack.Track_length = 425.95571656352956
+	correctTrack.Track_length = 443.2573603705269
 
 	if testTrack != correctTrack {
 		t.Fatal("Track info is different from test info")
