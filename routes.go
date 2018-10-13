@@ -79,8 +79,10 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.Glider_id = track.GliderID
 	newTrack.H_date = track.Date.String()
 
-	//Add the distance between the start and finish point
-	newTrack.Track_length = track.Points[0].Distance(track.Points[len(track.Points)-1])
+	//Distance calculation for a track
+	for i := 0; i < len(track.Points)-1; i++ {
+		newTrack.Track_length += track.Points[i].Distance(track.Points[i+1])
+	}
 
 	//Add track to array for all tracks
 	tracks = append(tracks, newTrack)
