@@ -129,6 +129,11 @@ func IgcID(w http.ResponseWriter, r *http.Request) {
 	//Check if the parameter passed is an integer.
 	i, err := strconv.Atoi(igcID)
 
+	//Absolute value the integer. We dont accept negative numbers!
+	if i < 0 {
+		i = i * -1
+	}
+
 	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		json.NewEncoder(w).Encode(tracks[i])
@@ -159,6 +164,11 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 
 		http.Error(w, "", 404) //404 Not found
 		return
+	}
+
+	//Absolute value the integer. We dont accept negative numbers!
+	if i < 0 {
+		i = i * -1
 	}
 
 	track := tracks[i]
