@@ -94,7 +94,7 @@ func TestIgcIDPost(t *testing.T) {
 }
 
 func TestIgcIDAll(t *testing.T) {
-	//Possible improvements. Better check fo the API response
+	//Possible improvements. Better check for the API response
 
 	//New test server
 	server := httptest.NewServer(http.HandlerFunc(IgcIDAll))
@@ -107,8 +107,8 @@ func TestIgcIDAll(t *testing.T) {
 	}
 
 	//Convert response to bits and then to string
-	bodyBytes, err2 := ioutil.ReadAll(res.Body)
-	if err2 != nil {
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
 		t.Fatal("Could not convert to string")
 	}
 	bodyString := string(bodyBytes)
@@ -169,23 +169,23 @@ func TestIgcID(t *testing.T) {
 	}
 
 	//Get whole Track with id 0
-	req1, err1 := http.Get(server.URL + "/igcinfo/api/igc/0")
-	if err1 != nil {
-		t.Fatal(err1)
+	req, err = http.Get(server.URL + "/igcinfo/api/igc/0")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	// Check the status code is what we expect.
-	if status := req1.StatusCode; status != http.StatusOK {
+	if status := req.StatusCode; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
 
 	//Response Track which we compare with the "correct" one
 	var testTrack Track
-	decoder1 := json.NewDecoder(req1.Body)
-	decoderr1 := decoder1.Decode(&testTrack)
-	if decoderr1 != nil {
-		t.Fatal(decoderr1)
+	decoder = json.NewDecoder(req.Body)
+	decoderr = decoder.Decode(&testTrack)
+	if decoderr != nil {
+		t.Fatal(decoderr)
 	}
 
 	//Fill inn correct information and test the response againt it.
@@ -243,19 +243,19 @@ func TestIgcIDField(t *testing.T) {
 	}
 
 	//Get whole Track with id 0 and pilot field
-	req1, err1 := http.Get(server.URL + "/igcinfo/api/igc/0/pilot")
-	if err1 != nil {
-		t.Fatal(err1)
+	req, err = http.Get(server.URL + "/igcinfo/api/igc/0/pilot")
+	if err != nil {
+		t.Fatal(err)
 	}
 	// Check the status code is what we expect.
-	if status := req1.StatusCode; status != http.StatusOK {
+	if status := req.StatusCode; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
 
 	//Get response body and check against the "correct" pilot
-	bodyBytes, err2 := ioutil.ReadAll(req1.Body)
-	if err2 != nil {
+	bodyBytes, err := ioutil.ReadAll(req.Body)
+	if err != nil {
 		t.Fatal("Could not convert to string")
 	}
 
