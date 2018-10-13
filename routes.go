@@ -160,15 +160,15 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 	//Try to convert the paramter to an int
 	i, err := strconv.Atoi(igcID)
 
+	//Absolute value the integer. We dont accept negative numbers!
+	if i < 0 {
+		i = i * -1
+	}
+
 	if err != nil || i >= len(tracks) { //Could not convert to int and
 
 		http.Error(w, "", 404) //404 Not found
 		return
-	}
-
-	//Absolute value the integer. We dont accept negative numbers!
-	if i < 0 {
-		i = i * -1
 	}
 
 	track := tracks[i]
