@@ -41,7 +41,6 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 
 //IgcIDPost handles and adds URL and flight routes into memory
 func IgcIDPost(w http.ResponseWriter, r *http.Request) {
-	//TODO: Handle ERRORS
 
 	//Decode incoming url
 	var decodedURL URL
@@ -156,29 +155,30 @@ func IgcField(w http.ResponseWriter, r *http.Request) {
 	//Try to convert the paramter to an int
 	i, err := strconv.Atoi(igcID)
 
-	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
-		track := tracks[i]
+	if err != nil || i >= len(tracks) { //Could not convert to int and
 
-		//Try to match user input with field from the selected track struct
-		r := reflect.ValueOf(track)
-		f := reflect.Indirect(r).FieldByName(upperIgcFIeld)
-
-		if strings.Contains(f.String(), "invalid Value") { //Does the field exist?
-			//Return 404 when it doesn't exist
-
-			http.Error(w, "", 404) //404 Not found
-			return
-		}
-
-		//Handle type
-		if strings.Contains(f.String(), "float64 Value") {
-			json.NewEncoder(w).Encode(f.Float()) //Print as float
-		} else {
-			json.NewEncoder(w).Encode(f.String()) //Print as string
-		}
-
-	} else {
 		http.Error(w, "", 404) //404 Not found
+		return
+	}
+
+	track := tracks[i]
+
+	//Try to match user input with field from the selected track struct
+	ref := reflect.ValueOf(track)
+	f := reflect.Indirect(ref).FieldByName(upperIgcFIeld)
+
+	if strings.Contains(f.String(), "invalid Value") { //Does the field exist?
+		//Return 404 when it doesn't exist
+
+		http.Error(w, "", 404) //404 Not found
+		return
+	}
+
+	//Handle type
+	if strings.Contains(f.String(), "float64 Value") {
+		json.NewEncoder(w).Encode(f.Float()) //Print as float
+	} else {
+		json.NewEncoder(w).Encode(f.String()) //Print as string
 	}
 
 }
