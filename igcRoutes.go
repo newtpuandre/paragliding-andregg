@@ -30,7 +30,7 @@ var tracks []Track
 func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 
 	//Fill the info struct with uptime and other information.
-	trackerInfo := apiInfo{Uptime: period.Between(startTime, time.Now()), Info: "Service for IGC tracks.", Version: "v1"}
+	trackerInfo := apiInfo{Uptime: period.Between(startTime, time.Now()), Info: "Service for Paragliding tracks.", Version: "v1"}
 
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -77,6 +77,7 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 	newTrack.Glider = track.GliderType
 	newTrack.Glider_id = track.GliderID
 	newTrack.H_date = track.Date.String()
+	newTrack.Track_src_url = s
 
 	//Distance calculation for a track
 	for i := 0; i < len(track.Points)-1; i++ {
