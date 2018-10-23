@@ -1,4 +1,4 @@
-//Tests for routes.go file
+//Tests for trackRoutes.go file
 //Improvements to be done: Clearer variable names.
 package main
 
@@ -22,7 +22,7 @@ func TestAPIInfoRoute(t *testing.T) {
 	defer server.Close()
 
 	//Make a GET request to the server
-	req, err := http.Get(server.URL + "/igcinfo/api")
+	req, err := http.Get(server.URL + "/paragliding/api")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,9 +54,9 @@ func TestAPIInfoRoute(t *testing.T) {
 
 }
 
-func TestIgcIDPost(t *testing.T) {
+func TestTrackIDPost(t *testing.T) {
 	//Create new test server
-	server := httptest.NewServer(http.HandlerFunc(IgcIDPost))
+	server := httptest.NewServer(http.HandlerFunc(TrackIDPost))
 	defer server.Close()
 
 	//Struct that we pass with the request
@@ -66,7 +66,7 @@ func TestIgcIDPost(t *testing.T) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(IGCURL)
 
-	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
+	req, err := http.Post(server.URL+"/paragliding/api/track", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,15 +93,15 @@ func TestIgcIDPost(t *testing.T) {
 
 }
 
-func TestIgcIDAll(t *testing.T) {
+func TestTrackIDAll(t *testing.T) {
 	//Possible improvements. Better check for the API response
 
 	//New test server
-	server := httptest.NewServer(http.HandlerFunc(IgcIDAll))
+	server := httptest.NewServer(http.HandlerFunc(TrackIDAll))
 	defer server.Close()
 
 	//Get Request
-	res, err := http.Get(server.URL + "/igcinfo/api/igc")
+	res, err := http.Get(server.URL + "/paragliding/api/track")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestIgcIDAll(t *testing.T) {
 	}
 }
 
-func TestIgcID(t *testing.T) {
+func TestTrackID(t *testing.T) {
 	//Create a new mux router and add routes and create a server
 	m := mux.NewRouter()
 	addRoutes(m)
@@ -144,7 +144,7 @@ func TestIgcID(t *testing.T) {
 	json.NewEncoder(b).Encode(IGCURL)
 
 	//Post IGCURL as json struct
-	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
+	req, err := http.Post(server.URL+"/paragliding/api/track", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +169,7 @@ func TestIgcID(t *testing.T) {
 	}
 
 	//Get whole Track with id 0
-	req, err = http.Get(server.URL + "/igcinfo/api/igc/0")
+	req, err = http.Get(server.URL + "/paragliding/api/track/0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestIgcID(t *testing.T) {
 
 }
 
-func TestIgcIDField(t *testing.T) {
+func TestTrackIDField(t *testing.T) {
 	//Possible improvements: Check more than one field.
 
 	//Create a new mux router and add routes and create a server
@@ -218,7 +218,7 @@ func TestIgcIDField(t *testing.T) {
 	json.NewEncoder(b).Encode(IGCURL)
 
 	//Post IGCURL as json struct
-	req, err := http.Post(server.URL+"/igcinfo/api/igc", "application/json", b)
+	req, err := http.Post(server.URL+"/paragliding/api/track", "application/json", b)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +243,7 @@ func TestIgcIDField(t *testing.T) {
 	}
 
 	//Get whole Track with id 0 and pilot field
-	req, err = http.Get(server.URL + "/igcinfo/api/igc/0/pilot")
+	req, err = http.Get(server.URL + "/paragliding/api/track/0/pilot")
 	if err != nil {
 		t.Fatal(err)
 	}

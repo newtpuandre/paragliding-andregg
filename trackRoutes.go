@@ -39,8 +39,8 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(trackerInfo)
 }
 
-//IgcIDPost handles and adds URL and flight routes into memory
-func IgcIDPost(w http.ResponseWriter, r *http.Request) {
+//TrackIDPost handles and adds URL and flight routes into memory
+func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 
 	//Decode incoming url
 	var decodedURL URL
@@ -103,8 +103,8 @@ func IgcIDPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//IgcIDAll returns an json array with all track ids
-func IgcIDAll(w http.ResponseWriter, r *http.Request) {
+//TrackIDAll returns an json array with all track ids
+func TrackIDAll(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -121,8 +121,8 @@ func IgcIDAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//IgcID returns a json object with a specific id
-func IgcID(w http.ResponseWriter, r *http.Request) {
+//TrackID returns a json object with a specific id
+func TrackID(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
@@ -145,8 +145,8 @@ func IgcID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//IgcField returns information about a specific field from a track
-func IgcField(w http.ResponseWriter, r *http.Request) {
+//TrackField returns information about a specific field from a track
+func TrackField(w http.ResponseWriter, r *http.Request) {
 	//Header is not set because it defaults to text/plain charset=utf-8
 
 	//Get parameters

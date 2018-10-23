@@ -21,10 +21,10 @@ func addRoutes(r *mux.Router) {
 	//IGC Routes located in igcRoutes.go
 	r.HandleFunc("/paragliding/api", APIInfoRoute).Methods("GET")
 	// /paragliding/ --> /paragliding/api
-	r.HandleFunc("/paragliding/api/igc", IgcIDPost).Methods("POST")
-	r.HandleFunc("/paragliding/api/igc", IgcIDAll).Methods("GET")
-	r.HandleFunc("/paragliding/api/igc/{igcId}", IgcID).Methods("GET")
-	r.HandleFunc("/paragliding/api/igc/{igcId}/{igcField}", IgcField).Methods("GET")
+	r.HandleFunc("/paragliding/api/track", TrackIDPost).Methods("POST")
+	r.HandleFunc("/paragliding/api/track", TrackIDAll).Methods("GET")
+	r.HandleFunc("/paragliding/api/track/{igcId}", TrackID).Methods("GET")
+	r.HandleFunc("/paragliding/api/track/{igcId}/{igcField}", TrackField).Methods("GET")
 
 	//Ticker Routes located in tickerRoutes.go
 	r.HandleFunc("/paragliding/api/ticker/latest", TickerLatest).Methods("GET")
