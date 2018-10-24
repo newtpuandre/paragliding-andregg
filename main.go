@@ -33,12 +33,12 @@ func addRoutes(r *mux.Router) {
 
 	//Webhook Routes located in webhookRoutes.go
 	r.HandleFunc("/paragliding/api/webhook/new_track", WebhookNewTrack).Methods("POST")
-	r.HandleFunc("/paragliding/api/webhook/new_track/{weebhook_id}", WebhookIDGet).Methods("GET")
-	r.HandleFunc("/paragliding/api/webhook/new_track/{weebhook_id}", WebhookIDDelete).Methods("DELETE")
+	r.HandleFunc("/paragliding/api/webhook/new_track/{webhook_id}", WebhookIDGet).Methods("GET")
+	r.HandleFunc("/paragliding/api/webhook/new_track/{webhook_id}", WebhookIDDelete).Methods("DELETE")
 
 	//Admin Routes located in adminRoutes.go
 	r.HandleFunc("/admin/api/tracks_count", AdminTrackCount).Methods("GET")
-	r.HandleFunc("/admin/api/tracks", AdminTracks).Methods("DELETE")
+	r.HandleFunc("/admin/api/tracks", AdminTracksDelete).Methods("DELETE")
 }
 
 func main() {
@@ -54,7 +54,8 @@ func main() {
 	//Make the router handle routes. Routes located in routes.go
 	addRoutes(router)
 
+	//dbInit()
 	//Log fatal errors and start the server
 	//log.Fatal(http.ListenAndServe(addr, router))
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

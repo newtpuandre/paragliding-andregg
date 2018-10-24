@@ -86,6 +86,7 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 
 	//Add track to array for all tracks
 	tracks = append(tracks, newTrack)
+	insertTrack(&newTrack)
 
 	//Add ID to array for used ids
 	trackID = append(trackID, lastID)

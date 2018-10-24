@@ -9,14 +9,17 @@ func AdminTrackCount(w http.ResponseWriter, r *http.Request) {
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	//Return the struct as a json object.
-	json.NewEncoder(w).Encode("Not yet Implemented")
+	count := countTrack()
+
+	json.NewEncoder(w).Encode(count)
 }
 
-func AdminTracks(w http.ResponseWriter, r *http.Request) {
+func AdminTracksDelete(w http.ResponseWriter, r *http.Request) {
 	//Specify content type
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 
 	//Return the struct as a json object.
+
+	deleteTrackCollection()
 	json.NewEncoder(w).Encode("Not yet Implemented")
 }

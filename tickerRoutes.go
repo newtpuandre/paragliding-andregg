@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+var paging = 5 //Paging
+
 func TickerLatest(w http.ResponseWriter, r *http.Request) {
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -14,6 +16,7 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 }
 
 func Ticker(w http.ResponseWriter, r *http.Request) {
+
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
