@@ -5,34 +5,33 @@ import (
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
-	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
 //mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding
 
-var client *mongo.Client
+type DBInfo struct {
+	ConnectionString string
+	DBString         string
+	CollectionString string
+}
 
-/*func dbInit() {
-	var err error
-	client, err = mongo.NewClient("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = client.Connect(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
-}*/
+var Credentials DBInfo
+
+func dbInit() {
+	Credentials.CollectionString = "tracks"
+	Credentials.DBString = "paragliding"
+	Credentials.ConnectionString = "mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding"
+}
 
 //Inserts a track into the track collection
 func insertTrack(t *Track) {
-	session, err := mgo.Dial("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
+	session, err := mgo.Dial(Credentials.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer session.Close()
 
-	err = session.DB("paragliding").C("tracks").Insert(t)
+	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).Insert(t)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -40,13 +39,13 @@ func insertTrack(t *Track) {
 }
 
 func countTrack() int {
-	session, err := mgo.Dial("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
+	session, err := mgo.Dial(Credentials.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer session.Close()
 
-	count, err := session.DB("paragliding").C("tracks").Count()
+	count, err := session.DB(Credentials.DBString).C(Credentials.CollectionString).Count()
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -56,7 +55,7 @@ func countTrack() int {
 }
 
 func getAllTracks() []Track {
-	session, err := mgo.Dial("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
+	session, err := mgo.Dial(Credentials.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -64,7 +63,7 @@ func getAllTracks() []Track {
 
 	var all []Track
 
-	err = session.DB("paragliding").C("tracks").Find(bson.M{}).All(&all)
+	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).Find(bson.M{}).All(&all)
 	return all
 }
 
@@ -74,15 +73,19 @@ func loadFromDB() {
 }
 
 //Deletes everything in the database
-func deleteTrackCollection() {
-	session, err := mgo.Dial("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
+func deleteTrackCollection() int {
+	count := countTrack() //Get database count
+
+	session, err := mgo.Dial(Credentials.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer session.Close()
 
-	err = session.DB("paragliding").C("tracks").DropCollection()
+	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).DropCollection()
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	return count
 }

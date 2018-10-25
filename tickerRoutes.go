@@ -19,6 +19,11 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 	var tempTracks = getAllTracks()
 	count := len(tempTracks) - 1
 
+	if count < 0 {
+		http.Error(w, "Nothing to show", 400) //400 bad request
+		return
+	}
+
 	//Return the struct as a json object.
 	json.NewEncoder(w).Encode(tempTracks[count].Timestamp)
 }
@@ -28,6 +33,10 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 	var tempTracks = getAllTracks()
 
 	var trackCount = len(tempTracks) - 1
+	if trackCount < 0 {
+		http.Error(w, "Nothing to show", 400) //400 bad request
+		return
+	}
 	var tempTicker tickerStruct
 
 	tempTicker.TLatest = tempTracks[trackCount].Timestamp
@@ -87,6 +96,10 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var trackCount = len(tempTracks) - 1
+	if trackCount < 0 {
+		http.Error(w, "Nothing to show", 400) //400 bad request
+		return
+	}
 	var tempTicker tickerStruct
 
 	tempTicker.TLatest = tempTracks[trackCount].Timestamp

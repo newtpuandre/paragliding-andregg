@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//Flytte til Database
+//Move to database?
 var webhookStructList []webhookStruct
 
 //stored in memory

@@ -51,6 +51,9 @@ func main() {
 	//Setup router
 	router := mux.NewRouter().StrictSlash(true)
 
+	//Set up credentials for MongoDB
+	dbInit()
+
 	//Update ID counts from DB
 	updateIdFromDB()
 
