@@ -10,13 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//Flytte til Database
-var tickerList []tickerStruct
-
-//stored in memory
-var tickerID []int
-var lastTickerID int
-
 var paging = 5 //Paging
 
 func TickerLatest(w http.ResponseWriter, r *http.Request) {
