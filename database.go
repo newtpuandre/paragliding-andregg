@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
@@ -35,6 +36,7 @@ func insertTrack(t *Track) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 }
 
 func countTrack() int {
@@ -51,6 +53,24 @@ func countTrack() int {
 	}
 
 	return count
+}
+
+func getAllTracks() []Track {
+	session, err := mgo.Dial("mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	var all []Track
+
+	err = session.DB("paragliding").C("tracks").Find(bson.M{}).All(&all)
+	return all
+}
+
+func loadFromDB() {
+	//Load tracks from DB into memory
+
 }
 
 //Deletes everything in the database

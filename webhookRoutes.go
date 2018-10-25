@@ -47,15 +47,14 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 	webhookID = append(webhookID, lastWebhookID)
 	//Remember to count up used ids
 
-	var HookID URLID
-	HookID.ID = lastWebhookID
+	var newID = strconv.Itoa(lastWebhookID)
 
 	lastWebhookID++
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(HookID)
+	json.NewEncoder(w).Encode(newID)
 }
 
 func WebhookIDGet(w http.ResponseWriter, r *http.Request) {

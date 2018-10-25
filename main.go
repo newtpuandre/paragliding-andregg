@@ -51,6 +51,9 @@ func main() {
 	//Setup router
 	router := mux.NewRouter().StrictSlash(true)
 
+	//Update ID counts from DB
+	updateIdFromDB()
+
 	//Make the router handle routes. Routes located in routes.go
 	addRoutes(router)
 

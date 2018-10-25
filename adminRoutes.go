@@ -21,5 +21,9 @@ func AdminTracksDelete(w http.ResponseWriter, r *http.Request) {
 	//Return the struct as a json object.
 
 	deleteTrackCollection()
+	lastID = 0
+	var emptyList []int
+	trackID = emptyList
+
 	json.NewEncoder(w).Encode("Not yet Implemented")
 }

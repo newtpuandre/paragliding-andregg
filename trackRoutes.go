@@ -18,13 +18,9 @@ import (
 //store startime of the application for further use
 var startTime = time.Now()
 
-//Tracks stored in memory
+//Track IDs stored in memory
 var trackID []int
 var lastID int
-
-//Uses the trackID index as a lookup indirectly.
-//The two elements are not directly attached.
-var tracks []Track
 
 //APIInfoRoute returns a struct with information about the api
 func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +33,14 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 
 	//Return the struct as a json object.
 	json.NewEncoder(w).Encode(trackerInfo)
+}
+
+func updateIdFromDB() {
+	count := countTrack()
+	for i := 0; i < count; i++ {
+		trackID = append(trackID, lastID)
+		lastID++
+	}
 }
 
 //TrackIDPost handles and adds URL and flight routes into memory
@@ -73,6 +77,7 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 	//Fill Track struct with required information
 	var newTrack Track
 
+	newTrack.Timestamp = time.Now().Unix()
 	newTrack.Pilot = track.Pilot
 	newTrack.Glider = track.GliderType
 	newTrack.Glider_id = track.GliderID
@@ -84,8 +89,6 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 		newTrack.Track_length += track.Points[i].Distance(track.Points[i+1])
 	}
 
-	//Add track to array for all tracks
-	tracks = append(tracks, newTrack)
 	insertTrack(&newTrack)
 
 	//Add ID to array for used ids
@@ -125,6 +128,7 @@ func TrackIDAll(w http.ResponseWriter, r *http.Request) {
 //TrackID returns a json object with a specific id
 func TrackID(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
+	var tracks = getAllTracks()
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
 
@@ -138,7 +142,14 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		json.NewEncoder(w).Encode(tracks[i])
+		var tempTrack TrackNoTimestamp
+		tempTrack.Glider = tracks[i].Glider
+		tempTrack.Glider_id = tracks[i].Glider_id
+		tempTrack.H_date = tracks[i].H_date
+		tempTrack.Pilot = tracks[i].Pilot
+		tempTrack.Track_length = tracks[i].Track_length
+		tempTrack.Track_src_url = tracks[i].Track_src_url
+		json.NewEncoder(w).Encode(tempTrack)
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
@@ -149,7 +160,7 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 //TrackField returns information about a specific field from a track
 func TrackField(w http.ResponseWriter, r *http.Request) {
 	//Header is not set because it defaults to text/plain charset=utf-8
-
+	var tracks = getAllTracks()
 	//Get parameters
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
@@ -165,6 +176,11 @@ func TrackField(w http.ResponseWriter, r *http.Request) {
 	//Absolute value the integer. We dont accept negative numbers!
 	if i < 0 {
 		i = i * -1
+	}
+
+	if upperIgcFIeld == "Timestamp" {
+		http.Error(w, "", 400)
+		return
 	}
 
 	if err != nil || i >= len(tracks) { //Could not convert to int and
