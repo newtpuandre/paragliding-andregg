@@ -26,28 +26,34 @@ func dbInit() {
 }
 
 //Inserts a track into the track collection
-func insertTrack(t *Track) {
-	session, err := mgo.Dial(Credentials.ConnectionString)
+func insertTrack(t *Track, db *DBInfo) {
+	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer session.Close()
 
-	err = session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).Insert(t)
+	err = session.DB(db.DBString).C(db.TrackCollectionString).Insert(t)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	//Add ID to array for used ids
+	trackID = append(trackID, lastID)
+
+	//Remember to count up used ids
+	lastID++
 
 }
 
-func countTrack() int {
-	session, err := mgo.Dial(Credentials.ConnectionString)
+func countTrack(db *DBInfo) int {
+	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer session.Close()
 
-	count, err := session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).Count()
+	count, err := session.DB(db.DBString).C(db.TrackCollectionString).Count()
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -70,7 +76,7 @@ func getAllTracks() []Track {
 }
 
 func updateIdFromDB() {
-	count := countTrack()
+	count := countTrack(&Credentials)
 	for i := 0; i < count; i++ {
 		trackID = append(trackID, lastID)
 		lastID++
@@ -91,7 +97,7 @@ func updateIdFromDB() {
 
 //Deletes everything in the database
 func deleteTrackCollection() int {
-	count := countTrack() //Get database count
+	count := countTrack(&Credentials) //Get database count
 
 	session, err := mgo.Dial(Credentials.ConnectionString)
 	if err != nil {

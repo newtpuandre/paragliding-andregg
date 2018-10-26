@@ -81,17 +81,12 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 		newTrack.Track_length += track.Points[i].Distance(track.Points[i+1])
 	}
 
-	insertTrack(&newTrack)
-
-	//Add ID to array for used ids
-	trackID = append(trackID, lastID)
+	//Pass DB Credentials and new track to function
+	insertTrack(&newTrack, &Credentials)
 
 	//Fill return struct
 	var idStruct URLID
 	idStruct.ID = lastID
-
-	//Remember to count up used ids
-	lastID++
 
 	//Return the struct as a json object.
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
