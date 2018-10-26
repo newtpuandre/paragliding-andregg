@@ -38,6 +38,7 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 		hookStruct.MinTriggerValue = 1
 	}
 
+	hookStruct.WebhookID = lastWebhookID
 	insertWebhook(&hookStruct)
 	//webhookStructList = append(webhookStructList, hookStruct)
 
@@ -109,7 +110,7 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 
-		http.Error(w, "", 400) //403 bad request
+		http.Error(w, "", 400) //400 bad request
 		return
 	}
 
@@ -120,16 +121,20 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 
 	//Could be better if i used a map
 	var found = -1
-	for j := range webhookID {
-		if webhookID[j] == i {
+	for j := range webhookStructList {
+		if webhookStructList[j].WebhookID == i {
 			found = j
 		}
 	}
 
-	if found != -1 && i < len(webhookStructList) { //Is an int and not bigger than tracks in memory
-		webhookID[found] = -1
+	if found != -1 { //Is an int and not bigger than tracks in memory
+		var newResponse webhookStructResponse
+		newResponse.WebhookURL = webhookStructList[found].WebhookURL
+		newResponse.MinTriggerValue = webhookStructList[found].MinTriggerValue
+
+		deleteWebhook(&webhookStructList[found])
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		json.NewEncoder(w).Encode(webhookStructList[i])
+		json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found

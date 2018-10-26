@@ -76,10 +76,15 @@ func updateIdFromDB() {
 		lastID++
 	}
 
-	count = countWebhook()
-	for i := 0; i < count; i++ {
-		webhookID = append(webhookID, lastWebhookID)
-		lastWebhookID++
+	hooks := getWebHooks()
+	for i := 0; i < len(hooks); i++ {
+		webhookID = append(webhookID, hooks[i].WebhookID)
+	}
+
+	if len(hooks) > 0 {
+		lastWebhookID = webhookID[len(webhookID)-1] + 1
+	} else {
+		lastWebhookID = 0
 	}
 
 }
@@ -156,5 +161,11 @@ func updateWebhook(w *webhookStruct) {
 }
 
 func deleteWebhook(w *webhookStruct) {
-	//Delete webhook here
+	session, err := mgo.Dial(Credentials.ConnectionString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	err = session.DB(Credentials.DBString).C(Credentials.WebhookCollectionString).Remove(bson.M{"_id": w.ID})
 }
