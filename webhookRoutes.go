@@ -9,9 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//Move to database?
-var webhookStructList []webhookStruct
-
 //stored in memory
 var webhookID []int
 var lastWebhookID int
@@ -41,7 +38,8 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 		hookStruct.MinTriggerValue = 1
 	}
 
-	webhookStructList = append(webhookStructList, hookStruct)
+	insertWebhook(&hookStruct)
+	//webhookStructList = append(webhookStructList, hookStruct)
 
 	//Add ID to array for used ids
 	webhookID = append(webhookID, lastWebhookID)
@@ -58,6 +56,7 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 }
 
 func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
+	webhookStructList := getWebHooks()
 	//Get parameters
 	vars := mux.Vars(r)
 	hookID := vars["webhook_id"]
@@ -86,8 +85,12 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if found != -1 && i < len(webhookStructList) { //Is an int and not bigger than tracks in memory
+		var newResponse webhookStructResponse
+		newResponse.WebhookURL = webhookStructList[i].WebhookURL
+		newResponse.MinTriggerValue = webhookStructList[i].MinTriggerValue
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		json.NewEncoder(w).Encode(webhookStructList[i])
+
+		json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
@@ -95,6 +98,7 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
+	webhookStructList := getWebHooks()
 	//Get parameters
 	vars := mux.Vars(r)
 	hookID := vars["webhook_id"]
@@ -130,4 +134,23 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
 	}
+}
+
+//Go through all webhooks and check if webhooks should be invoked
+func invokeWebHook() {
+	Hooks := getWebHooks()
+
+	for i := range Hooks {
+		Hooks[i].NewTracks++
+		if Hooks[i].NewTracks%Hooks[i].MinTriggerValue == 0 {
+			postWebHook(&Hooks[i])
+		}
+		updateWebhook(&Hooks[i])
+	}
+
+}
+
+func postWebHook(w *webhookStruct) {
+	fmt.Println("Invoking " + w.WebhookURL)
+	//Post to slack or discord.
 }

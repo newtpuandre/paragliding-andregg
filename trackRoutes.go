@@ -35,14 +35,6 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(trackerInfo)
 }
 
-func updateIdFromDB() {
-	count := countTrack()
-	for i := 0; i < count; i++ {
-		trackID = append(trackID, lastID)
-		lastID++
-	}
-}
-
 //TrackIDPost handles and adds URL and flight routes into memory
 func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 
@@ -104,6 +96,9 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 	//Return the struct as a json object.
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	json.NewEncoder(w).Encode(idStruct)
+
+	//Invoke webhooks
+	invokeWebHook()
 
 }
 

@@ -43,10 +43,10 @@ func addRoutes(r *mux.Router) {
 
 func main() {
 
-	addr, err := determineListenAddress() //Get listening address
+	/*addr, err := determineListenAddress() //Get listening address
 	if err != nil {
 		log.Fatal(err)
-	}
+	}*/
 
 	//Setup router
 	router := mux.NewRouter().StrictSlash(true)
@@ -54,7 +54,7 @@ func main() {
 	//Set up credentials for MongoDB
 	dbInit()
 
-	//Update ID counts from DB
+	//Update ID count from DB
 	updateIdFromDB()
 
 	//Make the router handle routes. Routes located in routes.go
@@ -62,6 +62,6 @@ func main() {
 
 	//dbInit()
 	//Log fatal errors and start the server
-	log.Fatal(http.ListenAndServe(addr, router))
-	//log.Fatal(http.ListenAndServe(":8080", router))
+	//log.Fatal(http.ListenAndServe(addr, router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

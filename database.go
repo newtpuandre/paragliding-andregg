@@ -10,15 +10,17 @@ import (
 //mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding
 
 type DBInfo struct {
-	ConnectionString string
-	DBString         string
-	CollectionString string
+	ConnectionString        string
+	DBString                string
+	TrackCollectionString   string
+	WebhookCollectionString string
 }
 
 var Credentials DBInfo
 
 func dbInit() {
-	Credentials.CollectionString = "tracks"
+	Credentials.TrackCollectionString = "tracks"
+	Credentials.WebhookCollectionString = "webhooks"
 	Credentials.DBString = "paragliding"
 	Credentials.ConnectionString = "mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding"
 }
@@ -31,7 +33,7 @@ func insertTrack(t *Track) {
 	}
 	defer session.Close()
 
-	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).Insert(t)
+	err = session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).Insert(t)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -45,7 +47,7 @@ func countTrack() int {
 	}
 	defer session.Close()
 
-	count, err := session.DB(Credentials.DBString).C(Credentials.CollectionString).Count()
+	count, err := session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).Count()
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -63,12 +65,22 @@ func getAllTracks() []Track {
 
 	var all []Track
 
-	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).Find(bson.M{}).All(&all)
+	err = session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).Find(bson.M{}).All(&all)
 	return all
 }
 
-func loadFromDB() {
-	//Load tracks from DB into memory
+func updateIdFromDB() {
+	count := countTrack()
+	for i := 0; i < count; i++ {
+		trackID = append(trackID, lastID)
+		lastID++
+	}
+
+	count = countWebhook()
+	for i := 0; i < count; i++ {
+		webhookID = append(webhookID, lastWebhookID)
+		lastWebhookID++
+	}
 
 }
 
@@ -82,10 +94,67 @@ func deleteTrackCollection() int {
 	}
 	defer session.Close()
 
-	err = session.DB(Credentials.DBString).C(Credentials.CollectionString).DropCollection()
+	err = session.DB(Credentials.DBString).C(Credentials.TrackCollectionString).DropCollection()
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	return count
+}
+
+func getWebHooks() []webhookStruct {
+	session, err := mgo.Dial(Credentials.ConnectionString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	var all []webhookStruct
+
+	err = session.DB(Credentials.DBString).C(Credentials.WebhookCollectionString).Find(bson.M{}).All(&all)
+	return all
+}
+
+func countWebhook() int {
+	session, err := mgo.Dial(Credentials.ConnectionString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	count, err := session.DB(Credentials.DBString).C(Credentials.WebhookCollectionString).Count()
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
+
+	return count
+}
+
+func insertWebhook(w *webhookStruct) {
+	session, err := mgo.Dial(Credentials.ConnectionString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	err = session.DB(Credentials.DBString).C(Credentials.WebhookCollectionString).Insert(w)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+func updateWebhook(w *webhookStruct) {
+	session, err := mgo.Dial(Credentials.ConnectionString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer session.Close()
+
+	err = session.DB(Credentials.DBString).C(Credentials.WebhookCollectionString).Update(bson.M{"_id": w.ID}, w)
+}
+
+func deleteWebhook(w *webhookStruct) {
+	//Delete webhook here
 }
