@@ -55,6 +55,7 @@ func TestAPIInfoRoute(t *testing.T) {
 }
 
 func TestTrackIDPost(t *testing.T) {
+	dbTestInit()
 	//Create new test server
 	server := httptest.NewServer(http.HandlerFunc(TrackIDPost))
 	defer server.Close()
@@ -94,6 +95,7 @@ func TestTrackIDPost(t *testing.T) {
 }
 
 func TestTrackIDAll(t *testing.T) {
+	dbTestInit()
 	//Possible improvements. Better check for the API response
 
 	//New test server
@@ -131,24 +133,49 @@ func TestTrackIDAll(t *testing.T) {
 }
 
 func TestTrackID(t *testing.T) {
+	dbTestInit()
 	testDB := setupDB(t)
-	var postTrack Track
-	postTrack.H_date = "2016-02-19 00:00:00 +0000 UTC"
-	postTrack.Pilot = "Miguel Angel Gordillo"
-	postTrack.Glider = "RV8"
-	postTrack.Glider_id = "EC-XLL"
-	postTrack.Track_length = 443.2573603705269
-	postTrack.Track_src_url = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
+	defer clearTrackCol(t, testDB)
 
-	server := httptest.NewServer(http.HandlerFunc(TrackID))
+	//Create a new mux router and add routes and create a server
+	m := mux.NewRouter()
+	addRoutes(m)
+	server := httptest.NewServer(m)
 
-	defer server.Close()
+	//URL Struct we send as body
+	var IGCURL URL
+	IGCURL.URL = "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 
-	//Simulate track post:
-	insertTrack(&postTrack, testDB)
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(IGCURL)
+
+	//Post IGCURL as json struct
+	req, err := http.Post(server.URL+"/paragliding/api/track", "application/json", b)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Check the status code is what we expect.
+	if status := req.StatusCode; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	//Response struct
+	var testID URLID
+	decoder := json.NewDecoder(req.Body)
+	decoderr := decoder.Decode(&testID)
+	if decoderr != nil {
+		t.Fatal(decoderr)
+	}
+
+	//Is the ID set and above 0?
+	if testID.ID < 0 {
+		t.Fatal("ID not correct or correctly added!")
+	}
 
 	//Get whole Track with id 0
-	req, err := http.Get(server.URL + "/paragliding/api/track/0")
+	req, err = http.Get(server.URL + "/paragliding/api/track/0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,8 +188,8 @@ func TestTrackID(t *testing.T) {
 
 	//Response Track which we compare with the "correct" one
 	var testTrack Track
-	decoder := json.NewDecoder(req.Body)
-	decoderr := decoder.Decode(&testTrack)
+	decoder = json.NewDecoder(req.Body)
+	decoderr = decoder.Decode(&testTrack)
 	if decoderr != nil {
 		t.Fatal(decoderr)
 	}
@@ -183,6 +210,9 @@ func TestTrackID(t *testing.T) {
 }
 
 func TestTrackIDField(t *testing.T) {
+	dbTestInit()
+	testDB := setupDB(t)
+	defer clearTrackCol(t, testDB)
 	//Possible improvements: Check more than one field.
 
 	//Create a new mux router and add routes and create a server

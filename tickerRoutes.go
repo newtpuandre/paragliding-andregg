@@ -16,7 +16,7 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	var tempTracks = getAllTracks()
+	var tempTracks = getAllTracks(&Credentials)
 	count := len(tempTracks) - 1
 
 	if count < 0 {
@@ -30,7 +30,7 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 
 func Ticker(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
-	var tempTracks = getAllTracks()
+	var tempTracks = getAllTracks(&Credentials)
 
 	var trackCount = len(tempTracks) - 1
 	if trackCount < 0 {
@@ -79,7 +79,7 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start := time.Now()
-	var tempTracks = getAllTracks()
+	var tempTracks = getAllTracks(&Credentials)
 
 	var index = -1
 	for i := range tempTracks {

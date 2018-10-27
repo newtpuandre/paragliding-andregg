@@ -55,7 +55,7 @@ func main() {
 	dbInit()
 
 	//Update ID count from DB
-	updateIdFromDB()
+	updateIdFromDB(&Credentials)
 
 	//Make the router handle routes. Routes located in routes.go
 	addRoutes(router)

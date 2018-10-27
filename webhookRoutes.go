@@ -39,7 +39,7 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hookStruct.WebhookID = lastWebhookID
-	insertWebhook(&hookStruct)
+	insertWebhook(&hookStruct, &Credentials)
 	//webhookStructList = append(webhookStructList, hookStruct)
 
 	//Add ID to array for used ids
@@ -57,7 +57,7 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 }
 
 func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
-	webhookStructList := getWebHooks()
+	webhookStructList := getWebHooks(&Credentials)
 	//Get parameters
 	vars := mux.Vars(r)
 	hookID := vars["webhook_id"]
@@ -79,16 +79,16 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 
 	//Could be better if i used a map
 	var found = -1
-	for j := range webhookID {
-		if webhookID[j] == i {
+	for j := range webhookStructList {
+		if webhookStructList[j].WebhookID == i {
 			found = j
 		}
 	}
 
-	if found != -1 && i < len(webhookStructList) { //Is an int and not bigger than tracks in memory
+	if found != -1 { //Is an int and not bigger than tracks in memory
 		var newResponse webhookStructResponse
-		newResponse.WebhookURL = webhookStructList[i].WebhookURL
-		newResponse.MinTriggerValue = webhookStructList[i].MinTriggerValue
+		newResponse.WebhookURL = webhookStructList[found].WebhookURL
+		newResponse.MinTriggerValue = webhookStructList[found].MinTriggerValue
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 		json.NewEncoder(w).Encode(newResponse)
@@ -99,7 +99,7 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
-	webhookStructList := getWebHooks()
+	webhookStructList := getWebHooks(&Credentials)
 	//Get parameters
 	vars := mux.Vars(r)
 	hookID := vars["webhook_id"]
@@ -132,7 +132,7 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 		newResponse.WebhookURL = webhookStructList[found].WebhookURL
 		newResponse.MinTriggerValue = webhookStructList[found].MinTriggerValue
 
-		deleteWebhook(&webhookStructList[found])
+		deleteWebhook(&webhookStructList[found], &Credentials)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		json.NewEncoder(w).Encode(newResponse)
 	} else {
@@ -143,14 +143,14 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 
 //Go through all webhooks and check if webhooks should be invoked
 func invokeWebHook() {
-	Hooks := getWebHooks()
+	Hooks := getWebHooks(&Credentials)
 
 	for i := range Hooks {
 		Hooks[i].NewTracks++
 		if Hooks[i].NewTracks%Hooks[i].MinTriggerValue == 0 {
 			postWebHook(&Hooks[i])
 		}
-		updateWebhook(&Hooks[i])
+		updateWebhook(&Hooks[i], &Credentials)
 	}
 
 }

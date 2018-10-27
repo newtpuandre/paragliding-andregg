@@ -20,7 +20,7 @@ func AdminTracksDelete(w http.ResponseWriter, r *http.Request) {
 
 	//Return the struct as a json object.
 
-	count := deleteTrackCollection()
+	count := deleteTrackCollection(&Credentials)
 
 	lastID = 0
 	var emptyList []int

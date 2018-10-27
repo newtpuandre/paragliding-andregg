@@ -84,6 +84,12 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 	//Pass DB Credentials and new track to function
 	insertTrack(&newTrack, &Credentials)
 
+	//Add ID to array for used ids
+	trackID = append(trackID, lastID)
+
+	//Remember to count up used ids
+	lastID++
+
 	//Fill return struct
 	var idStruct URLID
 	idStruct.ID = lastID
@@ -118,7 +124,7 @@ func TrackIDAll(w http.ResponseWriter, r *http.Request) {
 //TrackID returns a json object with a specific id
 func TrackID(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
-	var tracks = getAllTracks()
+	var tracks = getAllTracks(&Credentials)
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
 
@@ -130,7 +136,8 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 		i = i * -1
 	}
 
-	if err == nil && i < len(tracks) { //Is an int and not bigger than tracks in memory
+	if err == nil && i <= len(tracks)-1 { //Is an int and not bigger than tracks in memory
+
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		var tempTrack TrackNoTimestamp
 		tempTrack.Glider = tracks[i].Glider
@@ -140,6 +147,7 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 		tempTrack.Track_length = tracks[i].Track_length
 		tempTrack.Track_src_url = tracks[i].Track_src_url
 		json.NewEncoder(w).Encode(tempTrack)
+
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
@@ -150,7 +158,7 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 //TrackField returns information about a specific field from a track
 func TrackField(w http.ResponseWriter, r *http.Request) {
 	//Header is not set because it defaults to text/plain charset=utf-8
-	var tracks = getAllTracks()
+	var tracks = getAllTracks(&Credentials)
 	//Get parameters
 	vars := mux.Vars(r)
 	igcID := vars["igcId"]
