@@ -97,7 +97,7 @@ func sendMessage(timeStamp int, t tickerStruct) {
 		}
 	}
 
-	message.Content += "]. Request took (" + t.Processing.String() + ")."
+	message.Content += "]. Request took (" + t.Processing + ")."
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(message)
