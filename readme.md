@@ -4,7 +4,7 @@ Created by André Gyrud Gunhildberget
 
 Student Number : 493561
 
-Heroku Link : http://igcviewer-andregg.herokuapp.com/
+Heroku Link : https://paragliding-andregg.herokuapp.com/
 
 Discord link to check clock trigger (https://discord.gg/tCNeAKf)
 
