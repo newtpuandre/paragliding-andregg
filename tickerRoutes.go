@@ -69,7 +69,7 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	//Function run time
-	tempTicker.Processing = time.Since(start) / 1000000 //Convert to ms
+	tempTicker.Processing = time.Since(start).String() //Convert to ms
 	//Return the struct as a json object.
 	err := json.NewEncoder(w).Encode(tempTicker)
 	if err != nil {
@@ -142,7 +142,7 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	//Function run time
-	tempTicker.Processing = time.Since(start) //Convert to ms
+	tempTicker.Processing = time.Since(start).String() //Convert to ms
 	//Return the struct as a json object.
 	err = json.NewEncoder(w).Encode(tempTicker)
 	if err != nil {
