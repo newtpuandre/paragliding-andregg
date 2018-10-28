@@ -20,6 +20,7 @@ type DBInfo struct {
 //Credentials is a global variable with currently set DBInfo
 var Credentials DBInfo
 
+//Initialize database credentials
 func dbInit() {
 	Credentials.TrackCollectionString = "tracks"
 	Credentials.WebhookCollectionString = "webhooks"
@@ -42,6 +43,7 @@ func insertTrack(t *Track, db *DBInfo) {
 
 }
 
+//Count all tracks in the track collection
 func countTrack(db *DBInfo) int {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -58,6 +60,7 @@ func countTrack(db *DBInfo) int {
 	return count
 }
 
+//Gets all tracks from collection and return an array
 func getAllTracks(db *DBInfo) []Track {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -74,6 +77,7 @@ func getAllTracks(db *DBInfo) []Track {
 	return all
 }
 
+//Get ids from database and update global variables
 func updateIDFromDB(db *DBInfo) {
 	count := countTrack(db)
 	for i := 0; i < count; i++ {
@@ -112,6 +116,7 @@ func deleteTrackCollection(db *DBInfo) int {
 	return count
 }
 
+//Gets all webhooks from the collection and returns an array
 func getWebHooks(db *DBInfo) []webhookStruct {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -128,6 +133,8 @@ func getWebHooks(db *DBInfo) []webhookStruct {
 	return all
 }
 
+//Counts webhooks from the collection and returns an int
+//Currently unused. Future proofing.
 func countWebhook(db *DBInfo) int {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -144,6 +151,7 @@ func countWebhook(db *DBInfo) int {
 	return count
 }
 
+//Insert a webhook into the database
 func insertWebhook(w *webhookStruct, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -158,6 +166,7 @@ func insertWebhook(w *webhookStruct, db *DBInfo) {
 
 }
 
+//Updates a webhook based on MongoDB id
 func updateWebhook(w *webhookStruct, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -171,6 +180,7 @@ func updateWebhook(w *webhookStruct, db *DBInfo) {
 	}
 }
 
+//Deletes a webhook based on mongoDB Id
 func deleteWebhook(w *webhookStruct, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {

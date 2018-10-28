@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//tickerStruct contains information about ticker return structs
 type tickerStruct struct {
 	TLatest    int64         `json:"t_latest"`
 	TStart     int64         `json:"t_start"`

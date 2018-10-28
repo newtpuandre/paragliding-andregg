@@ -17,6 +17,7 @@ var lastWebhookID int
 
 //WebhookNewTrack parses incoming data and returns an id
 func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
+
 	//Decode incoming url
 	var hookStruct webhookStruct
 	hookStruct.WebhookURL = ""
@@ -43,14 +44,13 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 
 	hookStruct.WebhookID = lastWebhookID
 	insertWebhook(&hookStruct, &Credentials)
-	//webhookStructList = append(webhookStructList, hookStruct)
 
 	//Add ID to array for used ids
 	webhookID = append(webhookID, lastWebhookID)
-	//Remember to count up used ids
 
 	var newID = strconv.Itoa(lastWebhookID)
 
+	//Remember to count up used ids
 	lastWebhookID++
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -101,7 +101,7 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 		err = json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
-		http.Error(w, "", 404) //404 Not found
+		http.Error(w, "", 400) //400 bad request
 	}
 
 	if err != nil {
@@ -149,7 +149,7 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 		err = json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
-		http.Error(w, "", 404) //404 Not found
+		http.Error(w, "", 404) //Bad Request
 	}
 
 	if err != nil {
@@ -180,22 +180,22 @@ func invokeWebHook(id int) {
 func postWebHook(w *webhookStruct, id int) {
 	fmt.Println("Invoking " + w.WebhookURL)
 	//Struct that we pass with the request
-	start := time.Now()
+	start := time.Now() //Function processing time
 
 	tracks := getAllTracks(&Credentials)
 
-	var single = -1
-	var multiple []int
+	var single = -1    //Used if minTriggerValue == 1
+	var multiple []int //Used if minTriggerValue > 1
 
-	if w.MinTriggerValue == 1 {
-		for i := range tracks {
+	if w.MinTriggerValue == 1 { //Check minTriggerValue
+		for i := range tracks { //Find id that we want to post
 			if tracks[i].ID == id {
 				single = i
 			}
 		}
 
 	} else {
-
+		//Add all new ids since last post
 		for i := w.LastTrackID + 1; i <= w.LastTrackID+w.MinTriggerValue; i++ {
 			multiple = append(multiple, i)
 		}
@@ -204,14 +204,16 @@ func postWebHook(w *webhookStruct, id int) {
 	var message discordMessage
 	message.Content = "Latest timestamp: "
 
+	//Find the latest timestamp and make it a string
 	stringTimestamp := strconv.Itoa(int(tracks[len(tracks)-1].Timestamp))
 	message.Content += stringTimestamp
 	message.Content += ". New track ids are: ["
 
-	if single == -1 {
-		fmt.Println(multiple)
-		for i := range multiple {
+	if single == -1 { //minValueTrigger > 1
+
+		for i := range multiple { //Range over values
 			var trackID string
+
 			if len(tracks) < 3 { //Fixing out of bounds error
 				trackID = strconv.Itoa(tracks[multiple[i]-1].ID)
 			} else {
@@ -224,12 +226,12 @@ func postWebHook(w *webhookStruct, id int) {
 				message.Content = message.Content + "" + trackID
 			}
 		}
-	} else {
+	} else { //Just add the one id we found
 		trackID := strconv.Itoa(tracks[single].ID)
 		message.Content += trackID
 	}
 
-	Processing := time.Since(start) / 1000000
+	Processing := time.Since(start) //Time in MS
 	message.Content += "]. Request took (" + Processing.String() + ")."
 
 	hookURL := w.WebhookURL

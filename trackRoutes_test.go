@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//Tests the APIInfoRoute function
 func TestAPIInfoRoute(t *testing.T) {
 
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
@@ -54,6 +55,7 @@ func TestAPIInfoRoute(t *testing.T) {
 
 }
 
+//Tests the TrackIDPost function
 func TestTrackIDPost(t *testing.T) {
 	TestDbInit(t)
 	//Create new test server
@@ -94,6 +96,7 @@ func TestTrackIDPost(t *testing.T) {
 
 }
 
+//Tests the TrackIDAll function
 func TestTrackIDAll(t *testing.T) {
 	TestDbInit(t)
 	//Possible improvements. Better check for the API response
@@ -132,6 +135,7 @@ func TestTrackIDAll(t *testing.T) {
 	}
 }
 
+//Tests the TrackID function
 func TestTrackID(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)
@@ -209,6 +213,7 @@ func TestTrackID(t *testing.T) {
 
 }
 
+//Tests the TrackIDField function
 func TestTrackIDField(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)

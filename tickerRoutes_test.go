@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//Tests the TickerLatest function
 func TestTickerLatest(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)
@@ -55,6 +56,7 @@ func TestTickerLatest(t *testing.T) {
 
 }
 
+//Tests the TestTicker function
 func TestTicker(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)
@@ -97,6 +99,7 @@ func TestTicker(t *testing.T) {
 
 }
 
+//Tests the TickerTimestamp function
 func TestTickerTimestamp(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)

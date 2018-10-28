@@ -9,7 +9,9 @@ import (
 	"testing"
 )
 
+//Tests the TestAdminTrackCount function
 func TestAdminTrackCount(t *testing.T) {
+	//Setup test database variables
 	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
@@ -21,7 +23,7 @@ func TestAdminTrackCount(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(AdminTrackCount))
 
-	//Get whole Track with id 0
+	//Get track count
 	req, err := http.Get(server.URL + "/admin/api/tracks_count")
 	if err != nil {
 		t.Fatal(err)
@@ -46,7 +48,9 @@ func TestAdminTrackCount(t *testing.T) {
 
 }
 
+//Tests the TestAdminTracksDelete
 func TestAdminTracksDelete(t *testing.T) {
+	//Setup test database variables
 	TestDbInit(t)
 	testDB := setupDB(t)
 

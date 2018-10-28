@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//Tests the WebhookNewTrack function
 func TestWebhookNewTrack(t *testing.T) {
 	TestDbInit(t)
 	testDB := setupDB(t)
@@ -51,6 +52,7 @@ func TestWebhookNewTrack(t *testing.T) {
 
 }
 
+//Tests the WebhookIDGet function
 func TestWebhookIDGet(t *testing.T) {
 	//Reset some variables
 	var emptyArray []int
@@ -111,6 +113,7 @@ func TestWebhookIDGet(t *testing.T) {
 
 }
 
+//Tests the WebhookIDDelte function
 func TestWebhookIDDelete(t *testing.T) {
 	//Reset some variables
 	var emptyArray []int

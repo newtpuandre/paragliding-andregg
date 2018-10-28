@@ -34,9 +34,11 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 
 //Ticker returns information to the get request about the last 5 tracks inserted
 func Ticker(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
+	start := time.Now() //function processing time
+
 	var tempTracks = getAllTracks(&Credentials)
 
+	//If there are no tracks return error
 	var trackCount = len(tempTracks) - 1
 	if trackCount < 0 {
 		http.Error(w, "No tracks available", 400) //400 bad request
@@ -47,16 +49,20 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 	tempTicker.TLatest = tempTracks[trackCount].Timestamp
 	tempTicker.TStart = tempTracks[0].Timestamp
 
+	//Stop value is the id of the last track in response
 	var stop = paging - 1
 
+	//If there are less than five tracks, use the latest as stop
 	if trackCount < 5 {
 		stop = trackCount
 	}
 
+	//Add Track ids to array
 	for i := 0; i <= stop; i++ {
 		tempTicker.Tracks = append(tempTicker.Tracks, i)
 	}
 
+	//Get timestamp of the last id.
 	tempTicker.TStop = tempTracks[tempTicker.Tracks[len(tempTicker.Tracks)-1]].Timestamp
 
 	//Specify content type
@@ -87,15 +93,17 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start := time.Now()
+	start := time.Now() //Function processing time
 	var tempTracks = getAllTracks(&Credentials)
 
+	//If there are no tracks return error
 	var trackCount = len(tempTracks) - 1
 	if trackCount < 0 {
 		http.Error(w, "No tracks available", 400) //400 bad request
 		return
 	}
 
+	//Find first id with bigger timestamp
 	var index = -1
 	for i := range tempTracks {
 		if tempTracks[i].Timestamp > int64(newTimeStamp) {
@@ -104,9 +112,9 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//If there are no bigger timestamp than provided. Error
 	if index == -1 {
-		//error 400?
-		fmt.Println("No timestamp is bigger")
+		http.Error(w, "No timestamp is bigger", 400)
 		return
 	}
 
@@ -115,16 +123,20 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	tempTicker.TLatest = tempTracks[trackCount].Timestamp
 	tempTicker.TStart = tempTracks[index].Timestamp
 
+	//Stop value is the id of the last track in response
 	var stop = index + paging
 
+	//Are there less than 5 pages?
 	if index+paging > trackCount {
 		stop = trackCount
 	}
 
+	//Add ids to an array
 	for i := index; i <= stop; i++ {
 		tempTicker.Tracks = append(tempTicker.Tracks, i)
 	}
 
+	//Get timestamp of the last id.
 	tempTicker.TStop = tempTracks[tempTicker.Tracks[len(tempTicker.Tracks)-1]].Timestamp //Might be the correct behavior?
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

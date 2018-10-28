@@ -16,6 +16,7 @@ func TestDbInit(t *testing.T) {
 
 }
 
+//setupDB returns an DBInfo struct with filled variables
 func setupDB(t *testing.T) *DBInfo {
 	var testDB DBInfo
 	testDB.TrackCollectionString = "test_tracks"
@@ -26,6 +27,7 @@ func setupDB(t *testing.T) *DBInfo {
 	return &testDB
 }
 
+//Clears track collection
 func clearTrackCol(t *testing.T, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -40,6 +42,7 @@ func clearTrackCol(t *testing.T, db *DBInfo) {
 
 }
 
+//Clears Webhook Collection
 func clearHookCol(t *testing.T, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
@@ -52,6 +55,7 @@ func clearHookCol(t *testing.T, db *DBInfo) {
 	}
 }
 
+//Tests the InsertTrack function
 func TestInsertTrack(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
@@ -87,6 +91,7 @@ func TestInsertTrack(t *testing.T) {
 
 }
 
+//Tests the CountTrack function
 func TestCountTrack(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
@@ -107,6 +112,7 @@ func TestCountTrack(t *testing.T) {
 
 }
 
+//Tests the GetAllTracks Function
 func TestGetAllTracks(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
@@ -131,6 +137,7 @@ func TestGetAllTracks(t *testing.T) {
 
 }
 
+//Tests the DeleteTrackCollection Function
 func TestDeleteTrackCollection(t *testing.T) {
 	testDB := setupDB(t)
 
@@ -153,6 +160,7 @@ func TestDeleteTrackCollection(t *testing.T) {
 	}
 }
 
+//Tests the GetWebhooks Function
 func TestGetWebhooks(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
@@ -173,6 +181,7 @@ func TestGetWebhooks(t *testing.T) {
 
 }
 
+//Tests the CountWebhook Function
 func TestCountWebhook(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
@@ -189,6 +198,7 @@ func TestCountWebhook(t *testing.T) {
 
 }
 
+//Tests the InsertWebhook Function
 func TestInsertWebhook(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
@@ -220,6 +230,7 @@ func TestInsertWebhook(t *testing.T) {
 
 }
 
+//Tests the UpdateWebhook Function
 func TestUpdateWebhook(t *testing.T) {
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)

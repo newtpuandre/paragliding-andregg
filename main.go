@@ -19,7 +19,7 @@ func determineListenAddress() (string, error) { //Inorder to get the port heroku
 
 func addRoutes(r *mux.Router) {
 
-	//IGC Routes located in trackRoutes.go
+	//Track Routes located in trackRoutes.go
 	r.HandleFunc("/paragliding/api", APIInfoRoute).Methods("GET")
 	r.HandleFunc("/paragliding/", APIInfoRedirect).Methods("GET")
 	r.HandleFunc("/paragliding/api/track", TrackIDPost).Methods("POST")
@@ -61,7 +61,6 @@ func main() {
 	//Make the router handle routes. Routes located in routes.go
 	addRoutes(router)
 
-	//dbInit()
 	//Log fatal errors and start the server
 	//log.Fatal(http.ListenAndServe(addr, router))
 	log.Fatal(http.ListenAndServe(":8080", router))
