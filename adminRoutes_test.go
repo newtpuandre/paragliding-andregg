@@ -10,7 +10,7 @@ import (
 )
 
 func TestAdminTrackCount(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 
@@ -47,7 +47,7 @@ func TestAdminTrackCount(t *testing.T) {
 }
 
 func TestAdminTracksDelete(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 
 	var testTrack Track

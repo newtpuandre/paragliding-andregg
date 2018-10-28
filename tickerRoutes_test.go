@@ -14,7 +14,7 @@ import (
 )
 
 func TestTickerLatest(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 
@@ -56,7 +56,7 @@ func TestTickerLatest(t *testing.T) {
 }
 
 func TestTicker(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 
@@ -98,7 +98,7 @@ func TestTicker(t *testing.T) {
 }
 
 func TestTickerTimestamp(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 

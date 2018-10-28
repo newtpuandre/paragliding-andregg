@@ -1,4 +1,4 @@
-#IGC Track Viewer
+#Paragliding
 
 Created by André Gyrud Gunhildberget
 
@@ -7,6 +7,7 @@ Student Number : 493561
 Heroku Link : http://igcviewer-andregg.herokuapp.com/
 
 Discord link to check clock trigger (https://discord.gg/tCNeAKf)
+Discord webhook if you want to test: [Discord webhook link](https://discordapp.com/api/webhooks/506067534336753664/vrUY-fQ6A-dkRiIgR8SxV0-78HsC1ttVa2fQi0iD2ezyLuZo1lHoiD6tSsXa-_U2NpL9)
 
 #Clock Trigger Explanation
 The clock trigger code is located in the "clockTrigger" folder for the convenience of having all the code in one repository. The code is however standalone and running on openstack without affiliation to the api codebase. (You can copy both files and run it independently.)

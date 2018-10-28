@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -22,6 +23,14 @@ var startTime = time.Now()
 var trackID []int
 var lastID int
 
+//APIInfoRedirect redirects the user from /paragliding/ to /paragliding/api
+func APIInfoRedirect(w http.ResponseWriter, r *http.Request) {
+
+	//Redirect the user
+	http.Redirect(w, r, "/paragliding/api", http.StatusMovedPermanently)
+
+}
+
 //APIInfoRoute returns a struct with information about the api
 func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 
@@ -32,7 +41,10 @@ func APIInfoRoute(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(trackerInfo)
+	err := json.NewEncoder(w).Encode(trackerInfo)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //TrackIDPost handles and adds URL and flight routes into memory
@@ -69,6 +81,7 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 	//Fill Track struct with required information
 	var newTrack Track
 
+	newTrack.ID = lastID
 	newTrack.Timestamp = time.Now().Unix()
 	newTrack.Pilot = track.Pilot
 	newTrack.Glider = track.GliderType
@@ -87,38 +100,45 @@ func TrackIDPost(w http.ResponseWriter, r *http.Request) {
 	//Add ID to array for used ids
 	trackID = append(trackID, lastID)
 
-	//Remember to count up used ids
-	lastID++
-
 	//Fill return struct
 	var idStruct URLID
 	idStruct.ID = lastID
 
 	//Return the struct as a json object.
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	json.NewEncoder(w).Encode(idStruct)
+	err = json.NewEncoder(w).Encode(idStruct)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Invoke webhooks
-	invokeWebHook()
+	invokeWebHook(lastID)
+
+	//Remember to count up used ids
+	lastID++
 
 }
 
 //TrackIDAll returns an json array with all track ids
 func TrackIDAll(w http.ResponseWriter, r *http.Request) {
 
+	var err error
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if len(trackID) <= 0 { //Do we have content to display?
 
 		emptyArray := make([]string, 0) //Create an empty array and return it.
-		json.NewEncoder(w).Encode(emptyArray)
+		err = json.NewEncoder(w).Encode(emptyArray)
 
 	} else { //Show array in memory
 
-		json.NewEncoder(w).Encode(trackID)
+		err = json.NewEncoder(w).Encode(trackID)
 
 	}
-
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //TrackID returns a json object with a specific id
@@ -146,7 +166,11 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 		tempTrack.Pilot = tracks[i].Pilot
 		tempTrack.Track_length = tracks[i].Track_length
 		tempTrack.Track_src_url = tracks[i].Track_src_url
-		json.NewEncoder(w).Encode(tempTrack)
+
+		err := json.NewEncoder(w).Encode(tempTrack)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 	} else {
 		//Return bad request
@@ -157,6 +181,8 @@ func TrackID(w http.ResponseWriter, r *http.Request) {
 
 //TrackField returns information about a specific field from a track
 func TrackField(w http.ResponseWriter, r *http.Request) {
+	var err error
+
 	//Header is not set because it defaults to text/plain charset=utf-8
 	var tracks = getAllTracks(&Credentials)
 	//Get parameters
@@ -202,9 +228,13 @@ func TrackField(w http.ResponseWriter, r *http.Request) {
 
 	//Handle type
 	if strings.Contains(f.String(), "float64 Value") {
-		json.NewEncoder(w).Encode(f.Float()) //Print as float
+		err = json.NewEncoder(w).Encode(f.Float()) //Print as float
 	} else {
-		json.NewEncoder(w).Encode(f.String()) //Print as string
+		err = json.NewEncoder(w).Encode(f.String()) //Print as string
+	}
+
+	if err != nil {
+		fmt.Println(err)
 	}
 
 }

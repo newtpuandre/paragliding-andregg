@@ -9,6 +9,7 @@ import (
 
 //mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding
 
+//DBInfo contains information about database connection and collections
 type DBInfo struct {
 	ConnectionString        string
 	DBString                string
@@ -16,6 +17,7 @@ type DBInfo struct {
 	WebhookCollectionString string
 }
 
+//Credentials is a global variable with currently set DBInfo
 var Credentials DBInfo
 
 func dbInit() {
@@ -23,14 +25,6 @@ func dbInit() {
 	Credentials.WebhookCollectionString = "webhooks"
 	Credentials.DBString = "paragliding"
 	Credentials.ConnectionString = "mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding"
-}
-
-func dbTestInit() {
-	Credentials.TrackCollectionString = "test_tracks"
-	Credentials.WebhookCollectionString = "test_webhooks"
-	Credentials.DBString = "paragliding"
-	Credentials.ConnectionString = "mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding"
-
 }
 
 //Inserts a track into the track collection
@@ -74,10 +68,13 @@ func getAllTracks(db *DBInfo) []Track {
 	var all []Track
 
 	err = session.DB(db.DBString).C(db.TrackCollectionString).Find(bson.M{}).All(&all)
+	if err != nil {
+		panic(err)
+	}
 	return all
 }
 
-func updateIdFromDB(db *DBInfo) {
+func updateIDFromDB(db *DBInfo) {
 	count := countTrack(db)
 	for i := 0; i < count; i++ {
 		trackID = append(trackID, lastID)
@@ -109,7 +106,7 @@ func deleteTrackCollection(db *DBInfo) int {
 
 	err = session.DB(db.DBString).C(db.TrackCollectionString).DropCollection()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	return count
@@ -125,6 +122,9 @@ func getWebHooks(db *DBInfo) []webhookStruct {
 	var all []webhookStruct
 
 	err = session.DB(db.DBString).C(db.WebhookCollectionString).Find(bson.M{}).All(&all)
+	if err != nil {
+		panic(err)
+	}
 	return all
 }
 
@@ -147,13 +147,13 @@ func countWebhook(db *DBInfo) int {
 func insertWebhook(w *webhookStruct, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	defer session.Close()
 
 	err = session.DB(db.DBString).C(db.WebhookCollectionString).Insert(w)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 }
@@ -166,6 +166,9 @@ func updateWebhook(w *webhookStruct, db *DBInfo) {
 	defer session.Close()
 
 	err = session.DB(db.DBString).C(db.WebhookCollectionString).Update(bson.M{"_id": w.ID}, w)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func deleteWebhook(w *webhookStruct, db *DBInfo) {
@@ -176,4 +179,20 @@ func deleteWebhook(w *webhookStruct, db *DBInfo) {
 	defer session.Close()
 
 	err = session.DB(db.DBString).C(db.WebhookCollectionString).Remove(bson.M{"_id": w.ID})
+	if err != nil {
+		panic(err)
+	}
+}
+
+//clearWebhookID clears all last used ids in the webhook DB
+//inorder for the webhook post to work correctly
+func clearWebhookID(db *DBInfo) {
+	hooks := getWebHooks(db)
+
+	for i := range hooks {
+		hooks[i].LastTrackID = 0
+		hooks[i].NewTracks = 0
+		updateWebhook(&hooks[i], db)
+	}
+
 }

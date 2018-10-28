@@ -18,12 +18,12 @@ import (
 	"time"
 )
 
-var hook = "https://discordapp.com/api/webhooks/505005608274100227/oDA867lridvlzkbBLMcxeS3KrLcTBL0dXOHpSKTI_Ty8tu9Ycwd-DiuQiClN6mdybaZz"
+var hook = "https://discordapp.com/api/webhooks/506068687875342336/f1tbFV36A-c4JqRbSHH6Jdfbwce2EE_QHI2M0M1Z4m_nvKkRJlo7yWeJpb0bPJI7zj4S"
 
 var latestTimeStamp = 0
 
 func main() {
-	for t := range time.NewTicker(10 * time.Minute).C { //SET TO 10 MIN
+	for t := range time.NewTicker(10 * time.Minute).C {
 		checkNewTracks(t)
 	}
 }

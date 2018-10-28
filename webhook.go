@@ -8,6 +8,7 @@ type webhookStruct struct {
 	WebhookURL      string        `json:"webhookURL"`
 	MinTriggerValue int           `json:"minTriggerValue"`
 	NewTracks       int           `json:"newTracks"`
+	LastTrackID     int           `json:"lastTrackID"`
 }
 
 type webhookStructResponse struct {

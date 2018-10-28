@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -13,6 +15,7 @@ import (
 var webhookID []int
 var lastWebhookID int
 
+//WebhookNewTrack parses incoming data and returns an id
 func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 	//Decode incoming url
 	var hookStruct webhookStruct
@@ -53,9 +56,13 @@ func WebhookNewTrack(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(newID)
+	err = json.NewEncoder(w).Encode(newID)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
+//WebhookIDGet gets a webhook which matches the provided id, if it exists.
 func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 	webhookStructList := getWebHooks(&Credentials)
 	//Get parameters
@@ -91,13 +98,18 @@ func WebhookIDGet(w http.ResponseWriter, r *http.Request) {
 		newResponse.MinTriggerValue = webhookStructList[found].MinTriggerValue
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-		json.NewEncoder(w).Encode(newResponse)
+		err = json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
 	}
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
+//WebhookIDDelete deletes a webhook with a provided id, if it exists
 func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 	webhookStructList := getWebHooks(&Credentials)
 	//Get parameters
@@ -134,28 +146,109 @@ func WebhookIDDelete(w http.ResponseWriter, r *http.Request) {
 
 		deleteWebhook(&webhookStructList[found], &Credentials)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		json.NewEncoder(w).Encode(newResponse)
+		err = json.NewEncoder(w).Encode(newResponse)
 	} else {
 		//Return bad request
 		http.Error(w, "", 404) //404 Not found
 	}
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //Go through all webhooks and check if webhooks should be invoked
-func invokeWebHook() {
+func invokeWebHook(id int) {
 	Hooks := getWebHooks(&Credentials)
 
 	for i := range Hooks {
 		Hooks[i].NewTracks++
 		if Hooks[i].NewTracks%Hooks[i].MinTriggerValue == 0 {
-			postWebHook(&Hooks[i])
+			//Post and update webhook with last used id
+			postWebHook(&Hooks[i], id)
+			Hooks[i].LastTrackID = id
+			updateWebhook(&Hooks[i], &Credentials)
+		} else {
+			//Just update the webhook without altering lastTrackID
+			updateWebhook(&Hooks[i], &Credentials)
 		}
-		updateWebhook(&Hooks[i], &Credentials)
 	}
 
 }
 
-func postWebHook(w *webhookStruct) {
+//postWebHook fills information and posts to the provided webhook.
+func postWebHook(w *webhookStruct, id int) {
 	fmt.Println("Invoking " + w.WebhookURL)
-	//Post to slack or discord.
+	//Struct that we pass with the request
+	start := time.Now()
+
+	tracks := getAllTracks(&Credentials)
+
+	var single = -1
+	var multiple []int
+
+	if w.MinTriggerValue == 1 {
+		for i := range tracks {
+			if tracks[i].ID == id {
+				single = i
+			}
+		}
+
+	} else {
+
+		for i := w.LastTrackID + 1; i <= w.LastTrackID+w.MinTriggerValue; i++ {
+			multiple = append(multiple, i)
+		}
+	}
+
+	var message discordMessage
+	message.Content = "Latest timestamp: "
+
+	stringTimestamp := strconv.Itoa(int(tracks[len(tracks)-1].Timestamp))
+	message.Content += stringTimestamp
+	message.Content += ". New track ids are: ["
+
+	if single == -1 {
+		fmt.Println(multiple)
+		for i := range multiple {
+			var trackID string
+			if len(tracks) < 3 { //Fixing out of bounds error
+				trackID = strconv.Itoa(tracks[multiple[i]-1].ID)
+			} else {
+				trackID = strconv.Itoa(tracks[multiple[i]].ID)
+			}
+
+			if i != len(multiple)-1 { //This is only for nice formatting
+				message.Content = message.Content + trackID + ", "
+			} else {
+				message.Content = message.Content + "" + trackID
+			}
+		}
+	} else {
+		trackID := strconv.Itoa(tracks[single].ID)
+		message.Content += trackID
+	}
+
+	Processing := time.Since(start) / 1000000
+	message.Content += "]. Request took (" + Processing.String() + ")."
+
+	hookURL := w.WebhookURL
+
+	b := new(bytes.Buffer)
+	err := json.NewEncoder(b).Encode(message)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	req, err := http.Post(hookURL, "application/json", b)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Report if the post was successful or not
+	if status := req.StatusCode; status != http.StatusNoContent {
+		fmt.Printf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
 }

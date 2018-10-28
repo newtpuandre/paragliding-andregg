@@ -12,6 +12,7 @@ import (
 
 var paging = 5 //Paging
 
+//TickerLatest returns the latest timestamp to the get request
 func TickerLatest(w http.ResponseWriter, r *http.Request) {
 	//Specify content type
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -25,16 +26,20 @@ func TickerLatest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(tempTracks[count].Timestamp)
+	err := json.NewEncoder(w).Encode(tempTracks[count].Timestamp)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
+//Ticker returns information to the get request about the last 5 tracks inserted
 func Ticker(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	var tempTracks = getAllTracks(&Credentials)
 
 	var trackCount = len(tempTracks) - 1
 	if trackCount < 0 {
-		http.Error(w, "Nothing to show", 400) //400 bad request
+		http.Error(w, "No tracks available", 400) //400 bad request
 		return
 	}
 	var tempTicker tickerStruct
@@ -60,9 +65,13 @@ func Ticker(w http.ResponseWriter, r *http.Request) {
 	//Function run time
 	tempTicker.Processing = time.Since(start) / 1000000 //Convert to ms
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(tempTicker)
+	err := json.NewEncoder(w).Encode(tempTicker)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
+//TickerTimestamp returns tracks bigger than provided timestamp to the post request
 func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	//Get parameters
 	vars := mux.Vars(r)
@@ -81,6 +90,12 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	var tempTracks = getAllTracks(&Credentials)
 
+	var trackCount = len(tempTracks) - 1
+	if trackCount < 0 {
+		http.Error(w, "No tracks available", 400) //400 bad request
+		return
+	}
+
 	var index = -1
 	for i := range tempTracks {
 		if tempTracks[i].Timestamp > int64(newTimeStamp) {
@@ -95,11 +110,6 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var trackCount = len(tempTracks) - 1
-	if trackCount < 0 {
-		http.Error(w, "Nothing to show", 400) //400 bad request
-		return
-	}
 	var tempTicker tickerStruct
 
 	tempTicker.TLatest = tempTracks[trackCount].Timestamp
@@ -122,5 +132,8 @@ func TickerTimestamp(w http.ResponseWriter, r *http.Request) {
 	//Function run time
 	tempTicker.Processing = time.Since(start) / 1000000 //Convert to ms
 	//Return the struct as a json object.
-	json.NewEncoder(w).Encode(tempTicker)
+	err = json.NewEncoder(w).Encode(tempTicker)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

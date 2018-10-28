@@ -7,6 +7,15 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
+//Used for tests
+func TestDbInit(t *testing.T) {
+	Credentials.TrackCollectionString = "test_tracks"
+	Credentials.WebhookCollectionString = "test_webhooks"
+	Credentials.DBString = "paragliding"
+	Credentials.ConnectionString = "mongodb://newtpu:database1@ds239903.mlab.com:39903/paragliding"
+
+}
+
 func setupDB(t *testing.T) *DBInfo {
 	var testDB DBInfo
 	testDB.TrackCollectionString = "test_tracks"
@@ -19,10 +28,10 @@ func setupDB(t *testing.T) *DBInfo {
 
 func clearTrackCol(t *testing.T, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
-	defer session.Close()
 	if err != nil {
 		t.Error(err)
 	}
+	defer session.Close()
 
 	err = session.DB(db.DBString).C(db.TrackCollectionString).DropCollection()
 	if err != nil {
@@ -33,11 +42,10 @@ func clearTrackCol(t *testing.T, db *DBInfo) {
 
 func clearHookCol(t *testing.T, db *DBInfo) {
 	session, err := mgo.Dial(db.ConnectionString)
-	defer session.Close()
 	if err != nil {
 		t.Error(err)
 	}
-
+	defer session.Close()
 	err = session.DB(db.DBString).C(db.WebhookCollectionString).DropCollection()
 	if err != nil {
 		t.Error(err)

@@ -14,7 +14,7 @@ import (
 )
 
 func TestWebhookNewTrack(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
 
@@ -57,7 +57,7 @@ func TestWebhookIDGet(t *testing.T) {
 	webhookID = emptyArray
 	lastWebhookID = 0
 
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
 
@@ -117,7 +117,7 @@ func TestWebhookIDDelete(t *testing.T) {
 	webhookID = emptyArray
 	lastWebhookID = 0
 
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearHookCol(t, testDB)
 

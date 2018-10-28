@@ -55,7 +55,7 @@ func TestAPIInfoRoute(t *testing.T) {
 }
 
 func TestTrackIDPost(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	//Create new test server
 	server := httptest.NewServer(http.HandlerFunc(TrackIDPost))
 	defer server.Close()
@@ -95,7 +95,7 @@ func TestTrackIDPost(t *testing.T) {
 }
 
 func TestTrackIDAll(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	//Possible improvements. Better check for the API response
 
 	//New test server
@@ -133,7 +133,7 @@ func TestTrackIDAll(t *testing.T) {
 }
 
 func TestTrackID(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 
@@ -210,7 +210,7 @@ func TestTrackID(t *testing.T) {
 }
 
 func TestTrackIDField(t *testing.T) {
-	dbTestInit()
+	TestDbInit(t)
 	testDB := setupDB(t)
 	defer clearTrackCol(t, testDB)
 	//Possible improvements: Check more than one field.
