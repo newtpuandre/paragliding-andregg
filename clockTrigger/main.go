@@ -31,7 +31,7 @@ func main() {
 func checkNewTracks(t time.Time) {
 	var timeStamp int
 
-	resp, err := http.Get("https://igcviewer-andregg.herokuapp.com/paragliding/api/ticker/latest")
+	resp, err := http.Get("https://paragliding-andregg.herokuapp.com/paragliding/api/ticker/latest")
 	if err != nil {
 		// handle error
 	}
@@ -61,7 +61,7 @@ func checkNewTracks(t time.Time) {
 
 func getIds(timeStamp int) tickerStruct {
 	newTime := strconv.Itoa(timeStamp)
-	resp, err := http.Get("https://igcviewer-andregg.herokuapp.com/paragliding/api/ticker/" + newTime)
+	resp, err := http.Get("https://paragliding-andregg.herokuapp.com/paragliding/api/ticker/" + newTime)
 
 	if err != nil {
 		// handle error
