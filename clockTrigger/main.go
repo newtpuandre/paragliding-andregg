@@ -5,6 +5,9 @@
 //It is however a single executable located on openstack and have no affiliation with
 //the api codebase
 
+//Inorder to run this independently you need to move this folder to its own folder and
+//rename package clocktrigger to package main
+
 package clocktrigger
 
 import (
